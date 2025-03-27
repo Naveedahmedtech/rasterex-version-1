@@ -1,0 +1,405 @@
+<rx-panel
+  *ngIf="visible"
+  [title]="'Annotations and Measurements'"
+  (onClose)="onClose()"
+  [draggable]="false"
+>
+  <div class="note-panel-container">
+    <div class="header-section">
+      <!-- <div class="search">
+        <img src="/assets/images/search-ico.svg" />
+        <input
+          type="text"
+          placeholder="Search for comments..."
+          [(ngModel)]="search"
+          (keyup)="onSearch($event)"
+        />
+      </div> -->
+      <div class="switch-container">
+        <!-- <h5>Show/Hide</h5> -->
+        <div class="switch-all">
+          <rx-switch [checked]="showAll" (change)="onShowAll($event)"></rx-switch>
+          <span>Show/Hide All ({{ calcAllCount() }})</span>
+        </div>
+        <div class="switch-group">
+          <div>
+            <rx-switch [checked]="showAnnotations" (change)="onShowAnnotations($event)"></rx-switch>
+            <span>Annotations ({{ calcAnnotationCount() }})</span>
+          </div>
+          <div>
+            <rx-switch [checked]="showMeasurements" (change)="onShowMeasurements($event)"></rx-switch>
+            <span>Measurements ({{ calcMeasurementsCount() }})</span>
+          </div>
+        </div>
+      </div>
+      <div class="sort">
+        <span>Sort:</span>
+        <rx-dropdown
+          [options]="sortOptions"
+          [value]="sortOptions[0]"
+          (valueChange)="onSortFieldChanged($event)"
+        >
+        </rx-dropdown>
+        <img
+          src="/assets/images/filter-ico.svg"
+          role="button"
+          [class.active]="isFilterActive"
+          (click)="filterVisible = !filterVisible"
+        />
+      </div>
+    </div>
+
+    <div class="main-section" (scroll)="scrollHandler($event)">
+      <div *ngIf="filterVisible">
+        <div (onClose)="filterVisible = false">
+          <div class="filters-container">
+            <div class="filters-body">
+              <label>Created by</label>
+              <rx-multi-select
+                [options]="createdByFilterOptions"
+                [allSelected]="true"
+                (selectedChange)="onCreatedByFilterChange($event)"
+              >
+              </rx-multi-select>
+              <label>Date of notes creation</label>
+              <rx-date-picker
+                [startDate]="dateFilter.startDate"
+                [endDate]="dateFilter.endDate"
+                (onSelect)="onDateSelect($event)"
+              >
+              </rx-date-picker>
+              <label>Page Number</label>
+              <rx-dropdown
+                [options]="pageNumbers"
+                [value]="pageNumbers[0]"
+                [align]="'right'"
+                [transparent]="false"
+                (valueChange)="onPageChange($event)"
+              >
+              </rx-dropdown>
+              <label *ngIf="calcAllCount() > 0">Type</label>
+              <div class="filters-type">
+                <div class="type-item" *ngIf="calcTextCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showText" (change)="onShowText($event)" />
+                  <span>Free Text</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcCalloutCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showCallout" (change)="onShowCallout($event)" />
+                  <span>Callout</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcNoteCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showNote" (change)="onShowNote($event)" />
+                  <span>Note</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcRectangleCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showRectangle" (change)="onShowRectangle($event)" />
+                  <span>Rectangle</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcRoundedRectangleCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showRoundedRectangle" (change)="onShowRoundedRectangle($event)" />
+                  <span>Rounded Rectangle</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcEllipseCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showEllipse" (change)="onShowEllipse($event)" />
+                  <span>Ellipse</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcPolygonCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showPolygon" (change)="onShowPolygon($event)" />
+                  <span>Polygon</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcCloudCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showCloud" (change)="onShowCloud($event)" />
+                  <span>Cloud</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcSingleEndArrowCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showSingleEndArrow" (change)="onShowSingleEndArrow($event)" />
+                  <span>Single End Arrow</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcFilledSingleEndArrowCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showFilledSingleEndArrow" (change)="onShowFilledSingleEndArrow($event)" />
+                  <span>Filled Single End Arrow</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcBothEndsArrowCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showBothEndsArrow" (change)="onShowBothEndsArrow($event)" />
+                  <span>Both Ends Arrow</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcFilledBothEndsArrowCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showFilledBothEndsArrow" (change)="onShowFilledBothEndsArrow($event)" />
+                  <span>Filled Both Ends Arrow</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcHighlighterCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showHighlighter" (change)="onShowHighlighter($event)" />
+                  <span>Highlighter</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcFreehandCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showFreehand" (change)="onShowFreehand($event)" />
+                  <span>Freehand</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcPolylineCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showPolyline" (change)="onShowPolyline($event)" />
+                  <span>Polyline</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcStampCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showStamp" (change)="onShowStamp($event)" />
+                  <span>Stamp</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcMeasureLengthCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showMeasureLength" (change)="onShowMeasureLength($event)" />
+                  <span>Measure Length</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcMeasureAreaCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showMeasureArea" (change)="onShowMeasureArea($event)" />
+                  <span>Measure Area</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcMeasurePathCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showMeasurePath" (change)="onShowMeasurePath($event)" />
+                  <span>Measure Path</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcMeasureRectangleCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showMeasureRectangle" (change)="onShowMeasureRectangle($event)" />
+                  <span>Measure Rectangle</span>
+                </div>
+
+                <div class="type-item" *ngIf="calcLinkCount() > 0">
+                  <input type="checkbox" [checked]="typeFilter.showLink" (change)="onShowLink($event)" />
+                  <span>Link</span>
+                </div>
+
+              </div>
+
+              <label *ngIf="getUniqueAuthorList().length > 0">Author</label>
+              <div class="filters-type">
+                <div class="type-item" *ngFor="let author of getUniqueAuthorList()">
+                  <input type="checkbox" [checked]="authorFilter.has(author)" (change)="onAuthorFilterChange(author)" />
+                  <span>{{ author }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="filters-footer">
+            <button (click)="onFilterApply()" class="btn btn-primary">
+              Apply
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!isEmpytyList; else emptyList" class="list">
+        <ng-container
+          *ngFor="let group of list | keyvalue : sortOrder; trackBy: trackByFn"
+        >
+          <div class="list-item">
+            <h4 class="date">{{ group.key }}</h4>
+            <div
+              *ngFor="let item of group.value"
+              class="note"
+              [class.selected]="item.getselected()"
+              [ngClass]="{ 'is-active': item.IsExpanded }"
+              (click)="SetActiveCommentThread($event, item.markupnumber, item)"
+            >
+              <!-- [ngClass]="{'is-active': item.markupnumber === activeMarkupNumber}" -->
+              <!-- (click)="SetActiveCommentThread($event, item.markupnumber, item)"> -->
+
+              <div [id]="'note-panel-' + item.markupnumber">
+                <div>
+                  <div class="note-comment-list">
+                    <div class="note-comment">
+                      <div class="item-note">
+                        <div class="item-comment-left">
+                          <div class="comment-img">
+                            <rx-annotation-shape-icon
+                              [type]="item.type"
+                              [subtype]="item.subtype"
+                              [pdfannotproxy]="item.pdfannotproxy"
+                              [pdfannotproxyType]="item.pdfannotproxyType"
+                            ></rx-annotation-shape-icon>
+                          </div>
+                          <div>
+                            <div class="author">{{ item.author }}</div>
+                            <div class="comments-date-count">
+                              <div class="date-and-time">
+                                {{ item.createdStr }}
+                              </div>
+                              <div class="comments-count">
+                                <img src="/assets/images/comment-ico.svg" />{{
+                                  item.GetComments().length
+                                }}
+                              </div>
+                            </div>
+                            <p *ngIf="item.text">{{ item.text }}</p>
+                            <p *ngIf="item.dimtext">{{ item.dimtext }}</p>
+                          </div>
+                          <div style="flex: 1"></div>
+                          <div *ngIf="(guiConfig$ | async).showmarkupZoom" (click)="zoomTo(item)">
+                            <img src="/assets/images/zoom-window-ico.svg" />
+                          </div>
+                          <div style="flex: 1"></div>
+                          <div
+                            class="statusMenuButton"
+                            (click)="toogleStatusMenu(item.markupnumber)"
+                          >
+                            <rx-comment-status-icon
+                              [type]="item.status"
+                            ></rx-comment-status-icon>
+                          </div>
+                          <menu
+                            *ngIf="visibleStatusMenuIndex === item.markupnumber"
+                            class="statusMenu"
+                          >
+                            <li *ngFor="let statusItem of statusTypes">
+                              <button
+                                (click)="onSetStatus(item, statusItem.value)"
+                              >
+                                <div>
+                                  <rx-comment-status-icon
+                                    [type]="statusItem.value"
+                                  ></rx-comment-status-icon>
+                                  <span>{{ statusItem.text }}</span>
+                                </div>
+                              </button>
+                            </li>
+                          </menu>
+                        </div>
+                        <div class="close-list" *ngIf="item.IsExpanded">
+                          <div
+                            [ngClass]="{ selected: true }"
+                            class="tooltip Comments-icon"
+                            (click)="onHideComment($event, item.markupnumber)"
+                          >
+                            <img
+                              src="/assets/images/arrow-down.svg"
+                              alt="icon"
+                            />
+                            <span class="tooltip-text tooltip-left">Hide</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      *ngFor="let itemNote of item.GetComments(); let i = index"
+                      class="note-comment"
+                    >
+                      <div *ngIf="itemNote" class="item-note">
+                        <div class="item-comment-left">
+                          <div class="comment-img">
+                            <rx-annotation-shape-icon
+                              [type]="item.type"
+                              [subtype]="item.subtype"
+                              [pdfannotproxy]="item.pdfannotproxy"
+                              [pdfannotproxyType]="item.pdfannotproxyType"
+                            ></rx-annotation-shape-icon>
+                          </div>
+                          <div>
+                            <div class="author">{{ itemNote.signature }}</div>
+                            <div class="comments-date-count">
+                              <div class="date-and-time">
+                                {{ item.createdStr }}
+                              </div>
+                              <div
+                                class="comments-count"
+                                *ngIf="
+                                  !item.text &&
+                                  !item.dimtext &&
+                                  item.markupnumber !== activeMarkupNumber
+                                "
+                              >
+                                <img src="/assets/images/comment-ico.svg" />{{
+                                  item.GetComments().length
+                                }}
+                              </div>
+                            </div>
+                            <p>{{ itemNote.value }}</p>
+                          </div>
+                        </div>
+                        <div
+                          *ngIf="!item.text && !item.dimtext && item.IsExpanded"
+                          class="close-list"
+                        >
+                          <div
+                            [ngClass]="{ selected: true }"
+                            class="tooltip Comments-icon"
+                            (click)="onHideComment($event, item.markupnumber)"
+                          >
+                            <img
+                              src="/assets/images/arrow-down.svg"
+                              alt="icon"
+                            />
+                            <span class="tooltip-text tooltip-left">Hide</span>
+                          </div>
+                        </div>
+
+                        <div class="comments-controls">
+                          <img
+                            src="/assets/images/pen-ico.svg"
+                            role="button"
+                            (click)="
+                              OnEditComment($event, item.markupnumber, itemNote)
+                            "
+                          />
+                          <img
+                            src="/assets/images/trash-ico.svg"
+                            role="button"
+                            (click)="
+                              OnRemoveComment($event, item, itemNote.id, i)
+                            "
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="note-input" (click)="$event.stopPropagation()">
+                    <input
+                      type="text"
+                      autofocus
+                      [placeholder]="
+                        item.GetComments().length === 0
+                          ? 'Add Comments...'
+                          : 'Add reply...'
+                      "
+                      [(ngModel)]="note[item.markupnumber]"
+                    />
+                    <img
+                      src="/assets/images/redo-ico.svg"
+                      role="button"
+                      [disabled]="!note[item.markupnumber]"
+                      (click)="onAddNote(item)"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <ng-template #emptyList>
+<!--         <div class="empty-list">
+          <p>
+            You don't have any notes yet. Click on the document to create a
+            note.
+          </p>
+        </div>
+ -->      
+      </ng-template>
+    </div>
+  </div>
+</rx-panel>

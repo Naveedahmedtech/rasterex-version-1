@@ -1,0 +1,50 @@
+
+@import "../../../../assets/scss/config.scss";
+
+.library-panel-container {
+    box-sizing: border-box;
+    scrollbar-width: thin;
+    max-height: 500px;
+  
+    section {
+      width: 285px;
+      h4 {
+        margin: 12px 0;
+        color: #a4abae;
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 16px;
+      }
+    }
+  
+    .templates-list {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      overflow-y: scroll;
+      height: 465px;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      justify-content: space-between;
+      div {
+        margin-top: 5px;
+        padding: 3px 0;
+        border: 1px solid #eee;
+        border-radius: 4px;
+      }
+    }
+  
+    .add-custom-stamp {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      margin: 5px 0;
+      font-size: 12px;
+      color: $main;
+  
+      img {
+        cursor: pointer;
+      }
+    }
+  }

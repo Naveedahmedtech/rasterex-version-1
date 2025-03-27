@@ -1,0 +1,24 @@
+<rx-panel [title]="'Symbols'" (onClose)="onPanelClose()">
+  <div class="library-panel-container" >
+    <section >
+      <div class="add-custom-stamp">
+        <input type="file" #fileUpload (change)="handleSymbolsUpload($event)" style="display: none;" multiple>
+        <button type="button" id="upload_button" class="btn btn-primary" (click)="fileUpload.click()">Upload Symbols</button>
+      </div>
+      
+      <div class="templates-list" style="height: 390px;">
+        <div *ngFor="let template of symbols; let i=index" class="stamp-container"  style="display: flex; align-items: center;">
+          <img
+          [imageTemplate]="template"
+          [src]="template.src"
+          style="width: 100px; height: 100px;object-fit: contain;" />
+          <button (click)="deleteSymbol(i)" style="border: none; background: none; cursor: pointer; padding: 0; margin-left: 8px;">
+            <img src="/assets/images/trash-ico.svg" />
+          </button>
+        </div> 
+      </div>
+    </section>
+  </div>
+</rx-panel>
+
+

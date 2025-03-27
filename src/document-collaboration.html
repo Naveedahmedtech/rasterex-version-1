@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>JS Document Collaboration Demo | Rasterex Viewer</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <script type="text/javascript" src="assets/scripts/jquery-2.1.0.min.js"></script>
+  <style>
+    iframe {
+      position: absolute;
+      width: 50%;
+      height: 100%;
+      border: none;
+    }
+    #iframe1 {
+      left: 0px;
+    }
+    #iframe2 {
+      right: 0px;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <iframe id="iframe1" href=""></iframe>
+    <iframe id="iframe2" href=""></iframe>
+  </div>
+  <script>
+    const getUniqueRoomName = () => {
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+      let roomName = 'Room_';
+      for (let i = 0; i < 8; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        roomName += characters[randomIndex];
+      }
+      return roomName;
+    }
+    const roomName = getUniqueRoomName();
+    const rootUrl = window.location.protocol + '//' + window.location.host + '/collaboration';
+    //const rootUrl = window.location.protocol + '//' + window.location.host;
+    const url = `${rootUrl}?roomName=${roomName}`;
+    console.log('[Collab] iframe.src:', url);
+
+    $('#iframe1').attr('src', url);
+    $('#iframe2').attr('src', url);
+
+
+    const rxview1 = document.getElementById("iframe1");
+    const rxview2 = document.getElementById("iframe2");
+
+    const rxview1cw = rxview1.contentWindow;
+    const rxview2cw = rxview2.contentWindow;
+
+    let fileobj = {filepath:"c:\\\\rasterex\\\\upload\\\\demo1.dwg", cacheid:"demo1-1aaac-468d894f"};
+
+    
+    /* $('#iframe1').on("load", function() {
+
+      rxview1cw.postMessage({
+          type: "guiConfig",
+          payload: {
+                  canFileOpen: false,
+                  canGetFileInfo: true,
+                  canAnnotate: true,
+                  canCollaborate: true,
+                  showAnnotationsOnLoad : true
+
+          }
+      }, "*");
+
+
+      try{
+        //rxview1cw.RxCore.setinitFile(fileobj);
+      }catch(err){
+        alert(JSON.stringify(err))
+      }
+
+
+    }); */
+
+    /* $('#iframe2').on("load", function() {
+
+      rxview2cw.postMessage({
+          type: "guiConfig",
+          payload: {
+                  canFileOpen: true,
+                  canGetFileInfo: true,
+                  canAnnotate: true,
+                  canCollaborate: true,
+                  showAnnotationsOnLoad : true
+          }
+      }, "*");
+      
+      try{
+        //rxview2cw.RxCore.setinitFile(fileobj);
+      }catch(err){
+        alert(JSON.stringify(err))
+      }
+
+
+    }); */
+
+
+    
+
+
+  </script>
+</body>
+</html>
