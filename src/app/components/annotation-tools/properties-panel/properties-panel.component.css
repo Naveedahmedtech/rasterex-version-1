@@ -1,0 +1,196 @@
+:root {
+  --accent: #31BD59;
+  --accent-secondary: #F0F7F9;
+  --main: #333C4E;
+  --secondary: #A4ABAE;
+  --light-secondary: #EDF1F2;
+  --inactive: #DBDBDB;
+  --background: #D6DADC;
+  --background-light: #F0F7F9;
+  --background-secondary: #F5F5F5;
+  --side-nav-background: #F0F7F9;
+  --side-nav-background-active: #FFFFFF;
+  --side-nav-color: #A6ADB0;
+  --side-nav-color-active: #31BD59;
+  --side-nav-panel-background: #FFFFFF;
+  --top-nav-background: #FFFFFF;
+  --top-nav-color: #333C4E;
+  --top-nav-background-active: #F0F7F9;
+  --top-nav-color-active: #333C4E;
+  --top-nav-border-bottom-color-active: transparent;
+  --toolbar-background: #FFFFFF;
+  --toolbar-color: #333C4E;
+  --toolbar-background-active: #31BD59;
+  --logo-height: auto;
+  --body-overflow: hidden;
+}
+
+/* === Panel Container === */
+.properties-panel-container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  font-family: "Segoe UI", sans-serif;
+  color: #333;
+}
+
+/* === Section Block === */
+.block-section {
+  margin-bottom: 10px;
+}
+
+/* === Section Title === */
+.section-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333c4e;
+}
+
+/* === Info Table === */
+.info-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 8px;
+}
+.info-container .header {
+  font-weight: bold;
+  background-color: #f4f6f8;
+  padding: 8px;
+  border-radius: 4px;
+}
+.info-container .row-header {
+  font-weight: 500;
+  color: #444;
+  padding: 6px 8px;
+  background: #fafafa;
+  border-radius: 4px;
+}
+.info-container div:not(.header):not(.row-header) {
+  padding: 6px 8px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+/* === Form Toggle === */
+.form-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+  padding: 8px 0;
+}
+.form-toggle span {
+  color: #007bff;
+}
+.form-toggle .icon-down::before,
+.form-toggle .icon-up::before {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 6px;
+  vertical-align: middle;
+  border-style: solid;
+}
+.form-toggle .icon-down::before {
+  border-width: 6px 5px 0 5px;
+  border-color: #007bff transparent transparent transparent;
+}
+.form-toggle .icon-up::before {
+  border-width: 0 5px 6px 5px;
+  border-color: transparent transparent #007bff transparent;
+}
+
+/* === Form Fields === */
+.form-section {
+  margin-top: 12px;
+}
+.form-section .field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+.form-section .field label {
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: #444;
+}
+.form-section .field input,
+.form-section .field textarea {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.2s ease;
+}
+.form-section .field input:focus,
+.form-section .field textarea:focus {
+  border-color: #007bff;
+  outline: none;
+}
+.form-section .field textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* === Alerts === */
+.alert {
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.alert.success {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+.alert.error {
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+/* === Loading Spinner === */
+.loading-spinner {
+  font-size: 14px;
+  font-style: italic;
+  color: #555;
+  margin-bottom: 12px;
+}
+
+/* === Buttons === */
+.btn-group {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+.btn-group button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.btn-group button:first-child {
+  background-color: #007bff;
+  color: white;
+}
+.btn-group button:first-child:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+.btn-group button:last-child {
+  background-color: #6c757d;
+  color: white;
+}
+.btn-group button:last-child:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+.btn-group button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/*# sourceMappingURL=properties-panel.component.css.map */

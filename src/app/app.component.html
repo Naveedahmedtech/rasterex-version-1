@@ -9,7 +9,7 @@
   [class.full-width]="(guiConfig$ | async).disableSideNavMenu"
   [ngStyle]="{'filter': eventUploadFile ? 'blur(3px)' : 'none' }">
   <div id="mainContent" class="main-content" [class.overflow-hidden]="!(numOpenFiles$ | async)">
-    <div *ngIf="!(numOpenFiles$ | async)" class="welcome-content">
+    <div *ngIf="!(numOpenFiles$ | async)" class="welcome-content hidden">
       <img [src]="(guiConfig$ | async).logoUrl" />
       <!-- <div class="btn-choice-file" (click)="handleLoginClick()">Log In</div> -->
       <div *ngIf="!eventUploadFile" class="main-text">
@@ -31,7 +31,7 @@
       (window:keyup)="onKeyup($event)">
         <iframe id="foxitframe" src="/assets/html/foxpage.html"></iframe>
         <div id="lineConnector" class="lineconnector-container">&nbsp;</div>
-        
+
         <div *ngIf="isUploadFile" class="progress-container">
           <div class="progress">
               <div>It takes a few seconds to open this document...</div>
@@ -41,7 +41,7 @@
 
     </div>
     <rx-annotation-tools></rx-annotation-tools>
-    <rx-bottom-toolbar *ngIf="numOpenFiles$ | async" [(isVisible)]="isVisible" [lists]="lists"></rx-bottom-toolbar>
+<!--    <rx-bottom-toolbar *ngIf="numOpenFiles$ | async" [(isVisible)]="isVisible" [lists]="lists"></rx-bottom-toolbar>-->
     <div *ngFor="let list of lists;">
       <div *ngIf="list.linkURL !== ' ' && list.linkURL !== '' && isVisible && list.type !== 20" class="link" [ngStyle]="{ 'top.px' : list.rectangle?.y, 'left.px' : list.rectangle?.x}">
         <img (click)="followLink = true; annotation = list;" src="/assets/images/link.svg" />
@@ -57,9 +57,9 @@
   <rx-search-panel class="note-sidebar"></rx-search-panel>
 </div>
 
-<confirmation-modal 
-    [opened]="followLink" 
-    [annotation]="annotation" 
+<confirmation-modal
+    [opened]="followLink"
+    [annotation]="annotation"
     [action]="'FOLLOW'"
     (closed)="followLink = false">
 </confirmation-modal>

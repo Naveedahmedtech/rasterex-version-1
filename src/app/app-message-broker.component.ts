@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { TopNavMenuService } from './components/top-nav-menu/top-nav-menu.service';
 import { ColorHelper } from './helpers/color.helper';
 import { NotificationService } from './components/notification/notification.service';
+import {SessionContextService} from "./services/session-context.service";
 
 @Component({
   selector: 'app-message-broker',
@@ -18,7 +19,8 @@ export class AppMessageBrokerComponent implements OnInit {
     private readonly compareService: CompareService,
     private readonly topNavMenuService: TopNavMenuService,
     private readonly colorHelper: ColorHelper,
-    private readonly notificationService: NotificationService) { }
+    private readonly notificationService: NotificationService,
+    private sessionContext: SessionContextService) { }
 
     currentPage: number = 0;
 
@@ -36,8 +38,11 @@ export class AppMessageBrokerComponent implements OnInit {
           }
 
           case "view": {
+            console.log("post message received!", event.data);
+            RXCore.setUser(event.data.metadata.userId, event.data.metadata.username)
             parent.postMessage({ type: "progressStart", message: "It takes a few seconds to open the file." }, "*");
-            RXCore.openFile(`${RXCore.Config.baseFileURL}${event.data.payload.fileName}`);
+            this.sessionContext.setUserContext(event.data.metadata.userId, event.data.metadata.projectId, event.data.metadata.username);
+            RXCore.setinitFile(event.data.payload);
             await firstValueFrom(this.rxCoreService.guiFileLoadComplete$);
             parent.postMessage({ type: "progressEnd" }, "*");
 

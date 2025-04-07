@@ -1,4 +1,4 @@
-<div class="file-galery-container" [ngStyle]="{'display': isUploadFile ? 'none' : 'flex' }">
+<div class="file-galery-container hidden" [ngStyle]="{'display': isUploadFile ? 'none' : 'flex' }">
     <ul class="left-tabbed-menu">
         <li [class.active]="leftTabActiveIndex == 0" (click)="leftTabActiveIndex=0">File gallery</li>
         <li [class.active]="leftTabActiveIndex == 1" (click)="leftTabActiveIndex=1">Upload your file</li>

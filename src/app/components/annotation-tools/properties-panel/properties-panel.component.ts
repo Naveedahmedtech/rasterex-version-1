@@ -1,9 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { AnnotationToolsService } from '../annotation-tools.service';
-import { RXCore } from 'src/rxcore';
-import { RxCoreService } from 'src/app/services/rxcore.service';
-import { ColorHelper } from 'src/app/helpers/color.helper';
-import { MARKUP_TYPES } from 'src/rxcore/constants';
+import {Component, OnInit} from '@angular/core';
+import {AnnotationToolsService} from '../annotation-tools.service';
+import {RXCore} from 'src/rxcore';
+import {RxCoreService} from 'src/app/services/rxcore.service';
+import {ColorHelper} from 'src/app/helpers/color.helper';
+import {MARKUP_TYPES} from 'src/rxcore/constants';
+import {IMarkup} from "../../../../rxcore/models/IMarkup";
+import {firstValueFrom} from "rxjs";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {NEST_URL} from "../../../constants";
+import {SessionContextService} from "../../../services/session-context.service";
 
 @Component({
   selector: 'rx-properties-panel',
@@ -12,17 +17,18 @@ import { MARKUP_TYPES } from 'src/rxcore/constants';
 })
 export class PropertiesPanelComponent implements OnInit {
   markup: any = -1;
+  currentMarkup: IMarkup | null = null;
   currentType: number = 0;
   visible: boolean = false;
   title: string;
   mainTabActiveIndex: number = 0;
   propertyTabActiveIndex: number = 0;
   text: string;
-  font: any = { style: {}};
+  font: any = {style: {}};
   color: string;
   strokeColor: string;
   snap: boolean = false;
-  locked : boolean = false;
+  locked: boolean = false;
 
   //strokeOpacity: number = 100;
   strokeThickness: number = 1;
@@ -37,16 +43,29 @@ export class PropertiesPanelComponent implements OnInit {
   isMainTabsVisible: boolean = true;
   isPropertyTextVisible: boolean = false;
   isPropertyTabsVisible: boolean = true;
-  isPropertyArrowsVisible : boolean = false;
+  isPropertyArrowsVisible: boolean = false;
   isFillOpacityVisible: boolean = true;
   isInfoTabVisible: boolean = true;
+  isLoading: boolean = false;
+  successMessage: string;
+  errorMessage: string;
 
   placeholder = ['Circle', 'Square', 'Triangle', 'Diamond'];
+
+
+  formTitle: string = '';
+  formDescription: string = '';
+  private latestGuiMarkup: { markup: any; operation: any };
+
 
   constructor(
     private readonly rxCoreService: RxCoreService,
     private readonly annotationToolsService: AnnotationToolsService,
-    private readonly colorHelper: ColorHelper) {}
+    private readonly colorHelper: ColorHelper,
+    private http: HttpClient,
+    private sessionContext: SessionContextService
+  ) {
+  }
 
   _setTitle(): void {
     if (this.markup == -1) {
@@ -70,7 +89,7 @@ export class PropertiesPanelComponent implements OnInit {
     }
 
 
-    switch(this.markup.type) {
+    switch (this.markup.type) {
       case MARKUP_TYPES.TEXT.type:
         this.title = "Text";
         break;
@@ -96,7 +115,7 @@ export class PropertiesPanelComponent implements OnInit {
 
       case MARKUP_TYPES.SHAPE.POLYGON.type:
 
-        switch(this.markup.subtype) {
+        switch (this.markup.subtype) {
           case MARKUP_TYPES.MEASURE.PATH.subType:
             this.title = "Measure Path";
             break;
@@ -107,8 +126,8 @@ export class PropertiesPanelComponent implements OnInit {
         break;
 
 
-        //this.title = "Polygon";
-        //break;
+      //this.title = "Polygon";
+      //break;
 
       case MARKUP_TYPES.PAINT.POLYLINE.type:
         this.title = "Poly line";
@@ -116,7 +135,7 @@ export class PropertiesPanelComponent implements OnInit {
 
 
       case MARKUP_TYPES.MEASURE.PATH.type:
-        switch(this.markup.subtype) {
+        switch (this.markup.subtype) {
           case MARKUP_TYPES.MEASURE.PATH.subType:
             this.title = "Measure";
             break;
@@ -130,8 +149,8 @@ export class PropertiesPanelComponent implements OnInit {
         this.title = "Area";
         break;
       case MARKUP_TYPES.ARROW.type:
-          this.title = "Arrow";
-          break;
+        this.title = "Arrow";
+        break;
       case MARKUP_TYPES.MEASURE.LENGTH.type:
         this.title = "Dimension";
         break;
@@ -158,14 +177,14 @@ export class PropertiesPanelComponent implements OnInit {
     this.isFillOpacityVisible = true;
     this.isPropertyArrowsVisible = false;
 
-    if (this.markup.type == MARKUP_TYPES.ARROW.type ) {
+    if (this.markup.type == MARKUP_TYPES.ARROW.type) {
       //this.isFillOpacityVisible = false;
       this.isPropertyTextVisible = false;
       this.isPropertyTabsVisible = false;
       this.propertyTabActiveIndex = 1;
       this.isPropertyArrowsVisible = true;
 
-    }else if
+    } else if
     (this.markup.type == MARKUP_TYPES.PAINT.HIGHLIGHTER.type && this.markup.subtype == MARKUP_TYPES.PAINT.HIGHLIGHTER.subType) {
       this.propertyTabActiveIndex = 2;
       this.isPropertyTabsVisible = false;
@@ -178,7 +197,7 @@ export class PropertiesPanelComponent implements OnInit {
       || (this.markup.type == MARKUP_TYPES.MEASURE.LENGTH.type)) {
       this.propertyTabActiveIndex = 1;
       this.isPropertyTabsVisible = false;
-    }  else if (this.markup.type == MARKUP_TYPES.COUNT.type) {
+    } else if (this.markup.type == MARKUP_TYPES.COUNT.type) {
       this.propertyTabActiveIndex = 2;
       this.isPropertyTabsVisible = this.isFillOpacityVisible = false;
     } else if (this.markup.type == MARKUP_TYPES.STAMP.type) {
@@ -194,29 +213,114 @@ export class PropertiesPanelComponent implements OnInit {
         this.propertyTabActiveIndex = 1;
       }
     }
+    // this.annotationToolsService.setPropertiesPanelState({ visible: true, readonly: false });
 
     console.log(this.isFillOpacityVisible);
   }
 
+  isFormCollapsed = true;
+
+  toggleForm() {
+    this.isFormCollapsed = !this.isFormCollapsed;
+  }
+
+  operation: any;
+  annotation: any;
+
   ngOnInit(): void {
+
+    //
+    this.rxCoreService.guiMarkup$.subscribe(({markup, operation}) => {
+      this.operation = operation;
+      this.annotation = markup;
+      this.snap = RXCore.getSnapState();
+
+      if (operation.deleted) return;
+
+      if (
+        markup === -1
+        || markup.type == MARKUP_TYPES.CALLOUT.type && markup.subtype == MARKUP_TYPES.CALLOUT.subType
+        || markup.type == MARKUP_TYPES.SIGNATURE.type && markup.subtype == MARKUP_TYPES.SIGNATURE.subType
+        || markup.GetAttribute("Signature")?.value
+      ) return;
+
+      if (this.operation?.created) {
+        RXCore.selectMarkUp(true);
+      }
+
+      switch (this.annotation.type) {
+        case MARKUP_TYPES.NOTE.type:
+          this.annotationToolsService.setNotePopoverState({visible: true, markup: this.annotation});
+          break;
+        case MARKUP_TYPES.ERASE.type:
+          if (this.annotation.subtype == MARKUP_TYPES.ERASE.subType) {
+            this.annotationToolsService.setErasePanelState({visible: true});
+          } else {
+            this.annotationToolsService.setPropertiesPanelState({visible: true, readonly: false});
+          }
+          break;
+        case MARKUP_TYPES.ARROW.type:
+          if (this.annotation.subType != MARKUP_TYPES.CALLOUT.subType) {
+            //this.annotationToolsService.setContextPopoverState({ visible : true });
+            this.annotationToolsService.setPropertiesPanelState({visible: true});
+          }
+          break;
+        case MARKUP_TYPES.MEASURE.LENGTH.type:
+          this.annotationToolsService.setPropertiesPanelState({visible: true});
+          break;
+        case MARKUP_TYPES.MEASURE.AREA.type:
+          if (this.annotation.subtype == MARKUP_TYPES.MEASURE.AREA.subType) {
+            this.annotationToolsService.setPropertiesPanelState({visible: true});
+          }
+          break;
+        case MARKUP_TYPES.MEASURE.PATH.type:
+        case MARKUP_TYPES.PAINT.POLYLINE.type:
+          if (this.annotation.subtype == MARKUP_TYPES.MEASURE.PATH.subType) {
+            this.annotationToolsService.setPropertiesPanelState({visible: true});
+          }
+          if (this.annotation.subtype == MARKUP_TYPES.PAINT.POLYLINE.subType) {
+            this.annotationToolsService.setPropertiesPanelState({visible: true, readonly: false});
+          }
+          if (this.annotation.subtype == MARKUP_TYPES.SHAPE.POLYGON.subType) {
+            this.annotationToolsService.setPropertiesPanelState({visible: true, readonly: false});
+          }
+
+          break;
+        default:
+          this.annotationToolsService.setPropertiesPanelState({visible: true, readonly: false});
+          break;
+      }
+
+
+    });
+
+
+    this.rxCoreService.guiMarkup$.subscribe(({markup, operation}) => {
+      this.latestGuiMarkup = {markup, operation};
+    });
+    this.currentMarkup = this.rxCoreService.getSelectedMarkup()
+    console.log("--->>> >>>> ?", this.markup)
+    console.log("Hello ")
+    this.rxCoreService.selectedMarkup$.subscribe(markup => {
+      this.currentMarkup = markup;
+    });
+
     this.rxCoreService.guiMarkup$.subscribe(({markup, operation}) => {
       this.markup = markup;
-
       if (
         markup === -1
         || operation.deleted
         //|| markup.type == MARKUP_TYPES.ARROW.type
         //|| markup.type == MARKUP_TYPES.MEASURE.LENGTH.type
         //|| markup.type == MARKUP_TYPES.MEASURE.PATH.type && markup.subtype == MARKUP_TYPES.MEASURE.PATH.subType
-        ) {
+      ) {
         this.visible = false;
         return;
       }
-      
+      console.log('MARKUP ---> ', {markup}, {attributes: markup.GetAttributes()});
+
       this.currentType = markup.type;
       this.locked = markup.locked;
-
-
       //|| markup.type == MARKUP_TYPES.MEASURE.AREA.type && markup.subtype == MARKUP_TYPES.MEASURE.AREA.subType
 
       this._setVisibility();
@@ -229,8 +333,8 @@ export class PropertiesPanelComponent implements OnInit {
       this.text = markup.text;
       this.font = {
         style: {
-            bold: markup.font.bold,
-            italic: markup.font.italic
+          bold: markup.font.bold,
+          italic: markup.font.italic
         },
         font: markup.font.fontName,
         size: markup.font.height
@@ -243,28 +347,31 @@ export class PropertiesPanelComponent implements OnInit {
       this.fillOpacity = markup.transparency;
       this.displayName = markup.GetAttributes()?.find(a => a.name == 'displayName')?.value;
       this.lengthMeasureType = markup.subtype;
-
+      console.log('attributes---> ', markup.uniqueID, (RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes())
+      this.formTitle = (RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes()?.find((att) => att.name === 'title')?.value || '';
       this.infoData = {
-        'Type:': (markup as any).getMarkupType().label,
-        'Author:': RXCore.getDisplayName(markup.signature),
+        // RXCore.getDisplayName(markup.signature) ||
+        'Author:': this.sessionContext.username,
         'Time:': (markup as any).GetDateTime(true),
-        'Page:': Number(markup.pagenumber) + 1,
-        'Layer:': markup.layer,
-        'GUID' : markup.uniqueID
+        'title': (RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes()?.find((att) => att.name === 'title')?.value,
+        'description': (markup as any).GetAttributes()?.find((att) => att.name === 'description')?.value
       };
+
+      if (markup.type == MARKUP_TYPES.COUNT.type) {
+        console.log("markup is selected!")
+      }
 
       if (markup.type == MARKUP_TYPES.COUNT.type) {
         this.infoData['Count'] = (markup as any).getcount();
       }
     });
 
-    
 
     this.annotationToolsService.propertiesPanelState$.subscribe(state => {
       this.visible = state?.visible;
       this.markup = state?.markup;
 
-      if(this.markup){
+      if (this.markup) {
 
         this.markup.subtype = this.markup.subType;
         this.currentType = this.markup.type;
@@ -272,28 +379,207 @@ export class PropertiesPanelComponent implements OnInit {
         this._setVisibility();
         this.isMainTabsVisible = false;
         this._setTitle();
-  
+
         this.snap = RXCore.getSnapState();
 
         this.color = RXCore.getLineColor();
         this.strokeColor = RXCore.getLineColor();
 
-        
+
         this.fillColor = this.colorHelper.hexToRgba(this.colorHelper.rgbToHex(RXCore.getFillColor()), 100);
         this.fillOpacity = 100;
-  
-        
+
+
         this.strokeThickness = RXCore.getLineWidth();
         this.strokeLineStyle = 0;
         this.lengthMeasureType = 0;
         this.lengthMeasureType = this.markup.subtype;
-    
+
       }
-        
-      
 
 
     });
+  }
+
+
+  onSave() {
+    this.isLoading = true;
+    this.successMessage = '';
+    this.errorMessage = '';
+
+    const {markup, operation} = this.latestGuiMarkup || {};
+
+    if (!markup || markup === -1) {
+      this.errorMessage = 'Markup is not ready.';
+      console.warn("⚠️ markup is not ready");
+      this.isLoading = false;
+      return;
+    }
+
+    this.markup = markup;
+    const markupObj = (RXCore as any).getmarkupobjByGUID(markup.uniqueID);
+    markupObj.ClearAttributes();
+    markupObj.customattributes = [
+      {name: 'title', value: this.formTitle},
+      {name: 'description', value: this.formDescription}
+    ];
+
+    this.infoData = {
+      ...this.infoData,
+      title: this.formTitle,
+      description: this.formDescription
+    };
+
+    this.createIssue({
+      title: this.formTitle,
+      description: this.formDescription,
+      projectId: this.sessionContext.projectId,
+      userId: this.sessionContext.userId
+    })
+      .then(() => {
+        RXCore.markUpSave();
+        this.successMessage = '✅ Issue created and saved successfully!';
+        console.log("✅ Issue created");
+      })
+      .catch((error) => {
+        RXCore.markUpSave(); // still save even if issue fails
+        this.errorMessage = '❌ Issue creation failed. Please try again.';
+        console.error('❌ Issue creation failed:', error);
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
+  }
+
+
+  // onSave() {
+  //   this.isLoading = true;
+  //   const { markup, operation } = this.latestGuiMarkup || {};
+  //
+  //   if (!markup || markup === -1) {
+  //     console.log("markup is not ready");
+  //     return;
+  //   }
+  //
+  //   this.markup = markup;
+  //   const markupObj = (RXCore as any).getmarkupobjByGUID(markup.uniqueID);
+  //   markupObj.ClearAttributes();
+  //   markupObj.customattributes = [
+  //     { name: 'title', value: this.formTitle },
+  //     { name: 'description', value: this.formDescription }
+  //   ];
+  //
+  //   this.infoData = {
+  //     ...this.infoData,
+  //     title: this.formTitle,
+  //     description: this.formDescription
+  //   };
+  //
+  //   this.createIssue({title: this.formTitle, description: this.formDescription, projectId: this.sessionContext.projectId, userId: this.sessionContext.userId})
+  //     .then(() => {
+  //       console.log("issue created")
+  //     })
+  //     .catch((error) => {
+  //       console.log('Saved custom attributes:', markupObj.customattributes);
+  //       RXCore.markUpSave();
+  //       this.successMessage = 'Issue Saved successfully!';
+  //       console.error('❌ Issue creation failed:', error);
+  //     }).finally(() => {
+  //     this.isLoading = false;
+  //   });
+  //
+  // }
+
+
+  // async onSave() {
+  //   const { markup, operation } = await firstValueFrom(this.rxCoreService.guiMarkup$);
+  //
+  //   if (markup === -1) {
+  //     console.log("markup is not ready");
+  //     return;
+  //   }
+  //
+  //   if (markup.type == MARKUP_TYPES.COUNT.type) {
+  //     console.log("markup is selected!");
+  //   }
+  //
+  //   this.markup = markup;
+  //   console.log('markup.uniqueID', markup.uniqueID);
+  //
+  //   const markupObj = (RXCore as any).getmarkupobjByGUID(markup.uniqueID);
+  //   markupObj.ClearAttributes();
+  //   markupObj.customattributes = [
+  //     { name: 'title', value: this.formTitle },
+  //     { name: 'description', value: this.formDescription }
+  //   ];
+  //
+  //   this.infoData = {
+  //     ...this.infoData,
+  //     title: this.formTitle,
+  //     description: this.formDescription
+  //   };
+  //
+  //   console.log('Saved custom attributes:', markupObj.customattributes);
+  //
+  //   RXCore.markUpSave();
+  // }
+
+
+  // onSave() {
+  //   this.rxCoreService.guiMarkup$.subscribe(({markup, operation}) => {
+  //     if (markup === -1) {
+  //       console.log("markup is not ready");
+  //       return;
+  //     }
+  //     if (markup.type == MARKUP_TYPES.COUNT.type) {
+  //       console.log("markup is selected!");
+  //     }
+  //     this.markup = markup;
+  //     console.log('markup.uniqueID', markup.uniqueID);
+  //     const markupObj = (RXCore as any).getmarkupobjByGUID(markup.uniqueID);
+  //     markupObj.ClearAttributes();
+  //     markupObj.customattributes = [
+  //       {name: 'title', value: this.formTitle},
+  //       {name: 'description', value: this.formDescription}
+  //     ];
+  //     this.infoData = {
+  //       ...this.infoData,
+  //       title: this.formTitle,
+  //       description: this.formDescription
+  //     };
+  //     console.log('Saved custom attributes:', markupObj.customattributes);
+  //   });
+  //   RXCore.markUpSave();
+  // }
+
+
+  createIssue(data): Promise<string> {
+    // Return issueId
+    return new Promise((resolve, reject) => {
+      const headers = new HttpHeaders();
+      this.http
+        .post<{ data: { id: string } }>(
+          `${NEST_URL}/api/v1/issue/create`,
+          data,
+          {headers}
+        )
+        .subscribe({
+          next: (response) => {
+            console.log('Issue created successfully:', response?.data?.id);
+            resolve(response?.data?.id); // ✅ Return the issueId
+          },
+          error: (error) => {
+            console.error('Error creating issue:', error);
+            reject(error);
+          },
+        });
+    });
+  }
+
+
+  onCancel() {
+    this.formTitle = '';
+    this.formDescription = '';
   }
 
   onTextChange(event): void {
@@ -312,9 +598,9 @@ export class PropertiesPanelComponent implements OnInit {
     RXCore.changeTextColor(color);
   }
 
- /*  onStrokeOpacityChange(): void {
-    console.log(this.strokeOpacity);
-  } */
+  /*  onStrokeOpacityChange(): void {
+     console.log(this.strokeOpacity);
+   } */
 
   onStrokeThicknessChange(): void {
     RXCore.setLineWidth(this.strokeThickness);
@@ -340,13 +626,13 @@ export class PropertiesPanelComponent implements OnInit {
     RXCore.markUpFilled();
 
     let selectedMarkup = RXCore.getSelectedMarkup();
- 
-    if((selectedMarkup.type === MARKUP_TYPES.SHAPE.RECTANGLE.type || 
-      selectedMarkup.type === MARKUP_TYPES.MEASURE.AREA.type) && 
-      (selectedMarkup as any).holes && 
+
+    if ((selectedMarkup.type === MARKUP_TYPES.SHAPE.RECTANGLE.type ||
+        selectedMarkup.type === MARKUP_TYPES.MEASURE.AREA.type) &&
+      (selectedMarkup as any).holes &&
       (selectedMarkup as any).holes.length) {
-        this.fillOpacity = 35;
-        RXCore.changeTransp(this.fillOpacity);
+      this.fillOpacity = 35;
+      RXCore.changeTransp(this.fillOpacity);
     }
   }
 
@@ -379,7 +665,6 @@ export class PropertiesPanelComponent implements OnInit {
     mrkUp.locked = onoff;
   }
 
-  
 
   onClose(): void {
     this.visible = false;

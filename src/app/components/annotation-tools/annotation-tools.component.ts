@@ -18,6 +18,9 @@ export class AnnotationToolsComponent implements OnInit {
   opened$ = this.service.opened$;
   guiConfig: IGuiConfig | undefined;
   shapesAvailable: number = 5;
+  showIssueModal = false;
+
+
 
   isActionSelected = {
     "TEXT": false,
@@ -116,9 +119,9 @@ export class AnnotationToolsComponent implements OnInit {
       if (operation.start) {
         this._deselectAllActions();
       }
-      
 
-      
+
+
     });
 
     this.rxCoreService.guiMarkup$.subscribe(({markup, operation}) => {
@@ -130,11 +133,13 @@ export class AnnotationToolsComponent implements OnInit {
         }
       }
 
+
       if (markup === -1 || operation?.created) {
         const selectedAction = Object.entries(this.isActionSelected).find(([key, value]) => value);
-
+console.log('selectedAction', selectedAction)
         //console.log("reset to default tool here");
         if(operation?.created){
+
           this._deselectAllActions();
         }
         //this._deselectAllActions();
@@ -144,6 +149,7 @@ export class AnnotationToolsComponent implements OnInit {
           this.onActionSelect(selectedAction[0]);
         }
       }
+      this.rxCoreService.setSelectedMarkup(markup);
 
     });
 
@@ -152,9 +158,9 @@ export class AnnotationToolsComponent implements OnInit {
       this.isActionSelected['SCALE_SETTING'] = state.visible;
 
       /*if(state.visible && this.isActionSelected['SCALE_SETTING'] === false){
-        // this.onActionSelect('SCALE_SETTING');    
+        // this.onActionSelect('SCALE_SETTING');
         this.isActionSelected['SCALE_SETTING'] = true;
-      }*/  
+      }*/
     });
 
     this.service.imagePanelState$.subscribe(state => {
@@ -184,7 +190,7 @@ export class AnnotationToolsComponent implements OnInit {
       if (key !== 'MARKUP_LOCK' && key !== 'SNAP' && key !== 'NO_SCALE' && key !== "MEASURE_CONTINUOUS") {
         this.isActionSelected[key] = false;
       }
-      
+
 
       /*case 'MARKUP_LOCK' :
         RXCore.lockMarkup(this.isActionSelected[actionName]);
@@ -203,8 +209,24 @@ export class AnnotationToolsComponent implements OnInit {
     //this.service.setPropertiesPanelState({ visible: false });
     //this.service.setMeasurePanelState({ visible: false });
     //this.service.setMeasurePanelDetailState({ visible: false });
-    
+
   }
+
+
+
+  openCustomIssueModal(): void {
+    this.showIssueModal = true;
+  }
+
+  closeIssueModal(): void {
+    this.showIssueModal = false;
+  }
+
+  selectIssueShape(shape: string): void {
+    this.onActionSelect(shape);
+    this.closeIssueModal();
+  }
+
 
   onActionSelect(actionName: string) {
     const selected = this.isActionSelected[actionName];
@@ -235,6 +257,7 @@ export class AnnotationToolsComponent implements OnInit {
         break;
 
       case 'SHAPE_ELLIPSE':
+        console.log("I got selected!!")
         RXCore.setGlobalStyle(true);
         RXCore.markUpShape(this.isActionSelected[actionName], 1);
         break;
@@ -308,7 +331,7 @@ export class AnnotationToolsComponent implements OnInit {
       case 'SCALE_SETTING':
           this.service.setMeasurePanelState({ visible: this.isActionSelected[actionName] });
           break;
-  
+
       case 'IMAGES_LIBRARY':
           this.service.setImagePanelState({ visible: this.isActionSelected[actionName] });
           break;
@@ -318,13 +341,13 @@ export class AnnotationToolsComponent implements OnInit {
       case 'SYMBOLS_LIBRARY':
           this.service.setSymbolPanelState({ visible: this.isActionSelected[actionName] });
           break;
-  
+
       /*case 'CALIBRATE':
           //RXCore.calibrate(true);
           this.calibrate(true);
           break;*/
-  
-      case 'MEASURE_CONTINUOUS':  
+
+      case 'MEASURE_CONTINUOUS':
 
         RXCore.markupAddMulti(this.isActionSelected[actionName]);
         break;
@@ -333,7 +356,7 @@ export class AnnotationToolsComponent implements OnInit {
 
       //MeasureDetailPanelComponent
         this.service.setMeasurePanelDetailState({ visible: this.isActionSelected[actionName], type: MARKUP_TYPES.MEASURE.LENGTH.type, created: true });
-        //this.annotationToolsService.setMeasurePanelState({ visible: true }); 
+        //this.annotationToolsService.setMeasurePanelState({ visible: true });
         //this.service.setPropertiesPanelState({ visible: this.isActionSelected[actionName], markup: MARKUP_TYPES.MEASURE.LENGTH,  readonly: false });
         RXCore.markUpDimension(this.isActionSelected[actionName], 0);
         break;
@@ -352,7 +375,7 @@ export class AnnotationToolsComponent implements OnInit {
       case 'MEASURE_RECTANGULAR_AREA':
           this.service.setMeasurePanelDetailState({ visible: this.isActionSelected[actionName], type: MARKUP_TYPES.SHAPE.RECTANGLE.type, created: true });
           RXCore.markupAreaRect(this.isActionSelected[actionName]);
-          break;         
+          break;
       case 'SNAP':
           RXCore.changeSnapState(this.isActionSelected[actionName]);
           break;
@@ -370,7 +393,7 @@ export class AnnotationToolsComponent implements OnInit {
         RXCore.markUpRedraw();
        break;
 
-        
+
 
     }
   }

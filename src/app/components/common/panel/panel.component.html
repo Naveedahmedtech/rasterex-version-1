@@ -3,7 +3,9 @@
     [bounds]="bounds"
     [inBounds]="true"
     [handle]="panelHeader"
-    class="panel-container">
+    class="panel-container"
+    [position]="{ x: 100, y: 200 }"
+>
     <div #panelHeader class="panel-header">
         <span class="title">{{title}}</span>
         <span class="btn-close" (click)="onCloseClick()">&times;</span>

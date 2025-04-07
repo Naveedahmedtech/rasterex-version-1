@@ -95,10 +95,10 @@ export class QuickActionsMenuComponent implements OnInit, OnDestroy {
 
         let topcenterx = xscaled + ((wscaled - xscaled) * 0.5);
         let topcentery = yscaled;
-        
+
         this.numbuttons = (markup.subtype == MARKUP_TYPES.SHAPE.POLYGON.subType ? 4 : 3);
         this.menuwidth = (this.buttonsize * this.numbuttons) + (this.buttongap * (this.numbuttons + 1));
-        this.menucenter = this.menuwidth * 0.5; 
+        this.menucenter = this.menuwidth * 0.5;
 
         //buttongap : number = 10;
         //buttonsize : number = 28;
@@ -117,7 +117,7 @@ export class QuickActionsMenuComponent implements OnInit, OnDestroy {
 
       this.numbuttons = 3;
       this.menuwidth = (this.buttonsize * this.numbuttons) + (this.buttongap * (this.numbuttons + 1));
-      this.menucenter = this.menuwidth * 0.5; 
+      this.menucenter = this.menuwidth * 0.5;
 
         //dx = (wscaled / 2) - 5 + _dx;
 
@@ -176,7 +176,7 @@ export class QuickActionsMenuComponent implements OnInit, OnDestroy {
 
         //dx = (wscaled / 2) - 24 + _dx;
         dx = (wscaled / 2) - this.menucenter;
-        
+
         this.rectangle = {
           x: xscaled + dx,
           y: (yscaled + dy) + rotoffset,
@@ -359,14 +359,14 @@ export class QuickActionsMenuComponent implements OnInit, OnDestroy {
   onInsertClick(): void {
     if(this.annotation.type === MARKUP_TYPES.SHAPE.RECTANGLE.type) {
       RXCore.markupRectToAreaSwitch(this.annotation);
-    }    
+    }
     if (this.operation?.created) { RXCore.selectMarkUp(true); }
- 
+
     RXCore.insertPoint();
     this.visible = false;
   }
 
-  onShowHideLabelClick(): void {    
+  onShowHideLabelClick(): void {
     if (this.operation?.created) { RXCore.selectMarkUp(true); }
     if(!this.annotation.hidevaluelabel) {
       this.annotation.hidelabelmarkupobj();
@@ -377,11 +377,11 @@ export class QuickActionsMenuComponent implements OnInit, OnDestroy {
     RXCore.markUpRedraw();
     this.visible = false;
   }
- 
-  onHoleClick(): void { 
+
+  onHoleClick(): void {
     if(this.annotation.type === MARKUP_TYPES.SHAPE.RECTANGLE.type) {
       RXCore.markupRectToAreaSwitch(this.annotation);
-    }   
+    }
     if (this.operation?.created) { RXCore.selectMarkUp(true); }
     this.annotationToolsService.setMeasurePanelDetailState({ visible: true, type: MARKUP_TYPES.MEASURE.AREA.type, created: true });
     //RXCore.markUpArea(true, this.annotation.markupnumber);

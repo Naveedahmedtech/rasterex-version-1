@@ -1,6 +1,6 @@
 <div
     *ngIf="((guiMode$ | async) == 'annotate' || (guiMode$ | async) == 'compare' || (guiMode$ | async) == 'measure' ) && visible"
-    class="quick-actions-container"
+    class="quick-actions-container hidden"
     [ngStyle]="{ 'top.px' : rectangle.y, 'left.px' : rectangle.x }">
     <ul *ngIf="((canUpdateAnnotation | async) || (canDeleteAnnotation | async))"
     class="menu" [class.bottom]="rectangle.position == 'bottom'">
@@ -9,7 +9,7 @@
             (click)="onEditClick()">
                 <img id="quickActionsMenuEdit" src="/assets/images/pen-ico.svg" />
         </li>
-        <li *ngIf="(canDeleteAnnotation | async)" 
+        <li *ngIf="(canDeleteAnnotation | async)"
             (click)="onDeleteClick()">
                 <img src="/assets/images/trash-ico.svg" />
         </li>
@@ -56,22 +56,22 @@
             (click)="onHoleClick()">
             <img id="quickActionsHole" src="/assets/images/insert-area-hole.svg" height="28" />
         </li>
-        
+
         <li
             *ngIf="(guiMode$ | async) == 'measure' && ((annotation.type === 1 && annotation.subtype === 3) || (annotation.type === 3 && annotation.subtype === 6) || annotation.type === 7 || annotation.type === 8)"
             (click)="onShowHideLabelClick()">
             <img id="quickActionsMenuShowHideLabel" src="/assets/images/label-remove.svg" height="23" />
             <!-- <span class="tooltip-text tooltip-top">Hide Label</span> -->
-        </li>        
+        </li>
 
     </ul>
 </div>
 
-<confirmation-modal 
+<confirmation-modal
     [opened]="confirmDeleteOpened"
     [text]="'Are you sure you want to delete this annotation?'"
     [action]="'DELETE'"
-    [annotation]="annotation" 
+    [annotation]="annotation"
     (closed)="confirmDeleteOpened = false">
 </confirmation-modal>
 
@@ -92,8 +92,8 @@
     </div>
 </rx-modal-dialog>
 
-<confirmation-modal 
-    [opened]="followLink" 
+<confirmation-modal
+    [opened]="followLink"
     [annotation]="annotation"
     [action]="'FOLLOW'"
     (closed)="followLink = false">

@@ -3,7 +3,7 @@ var UIConfig = (function() {
 
     let ConfigJSON = {
         "UIConfig" : {
-            
+
                 "canFileOpen": true,
                 "canSaveFile": true,
                 "canGetFileInfo": true,
@@ -18,16 +18,16 @@ var UIConfig = (function() {
                 "canCollaborate": false,
                 "canLogin" : false,
                 "showmarkupZoom" : false,
-                "showAnnotationsOnLoad" : false,
+                "showAnnotationsOnLoad" : true,
                 //"localStoreStamp" : true,
                 "localStoreAnnotation": true,
                 "disable2DVectorInfoButton" : false,
                 "watermarkdemo" : false,
                 "logoUrl": "/assets/images/logo.svg"
-            
+
         },
         "UIStyles" : [
-            
+
                 { "name": "accent", "value": "#31BD59" },
                 { "name": "accent-secondary", "value": "#F0F7F9" },
                 { "name": "main", "value": "#333C4E" },
@@ -55,7 +55,7 @@ var UIConfig = (function() {
 
 
     return {
-        
+
         ConfigJSON : ConfigJSON
 
     };
