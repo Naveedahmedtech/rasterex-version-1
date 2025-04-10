@@ -1,17 +1,20 @@
-import { Component, OnInit } from '@angular/core';
-import { AnnotationToolsService } from './annotation-tools.service';
-import { RXCore } from 'src/rxcore';
-import { RxCoreService } from 'src/app/services/rxcore.service';
-import { MARKUP_TYPES } from 'src/rxcore/constants';
-import { IGuiConfig } from 'src/rxcore/models/IGuiConfig';
-import { UserService } from '../user/user.service';
-import { firstValueFrom, lastValueFrom } from 'rxjs';
+import {Component, HostListener, OnInit, ViewEncapsulation} from '@angular/core';
+import {AnnotationToolsService} from './annotation-tools.service';
+import {RXCore} from 'src/rxcore';
+import {RxCoreService} from 'src/app/services/rxcore.service';
+import {MARKUP_TYPES} from 'src/rxcore/constants';
+import {IGuiConfig} from 'src/rxcore/models/IGuiConfig';
+import {UserService} from '../user/user.service';
+import {firstValueFrom, lastValueFrom} from 'rxjs';
+import {SessionContextService} from "../../services/session-context.service";
+import {NotificationService} from "../notification/notification.service";
 
 
 @Component({
   selector: 'rx-annotation-tools',
   templateUrl: './annotation-tools.component.html',
-  styleUrls: ['./annotation-tools.component.scss']
+  styleUrls: ['./annotation-tools.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class AnnotationToolsComponent implements OnInit {
   guiConfig$ = this.rxCoreService.guiConfig$;
@@ -19,7 +22,7 @@ export class AnnotationToolsComponent implements OnInit {
   guiConfig: IGuiConfig | undefined;
   shapesAvailable: number = 5;
   showIssueModal = false;
-
+  annotationCreated: boolean = false;
 
 
   isActionSelected = {
@@ -47,12 +50,12 @@ export class AnnotationToolsComponent implements OnInit {
     "SYMBOLS_LIBRARY": false,
     "LINKS_LIBRARY": false,
     "CALIBRATE": false,
-    "MEASURE_CONTINUOUS" : false,
+    "MEASURE_CONTINUOUS": false,
     "MEASURE_LENGTH": false,
     "MEASURE_AREA": false,
     "MEASURE_PATH": false,
     "SNAP": false,
-    "MARKUP_LOCK" : false,
+    "MARKUP_LOCK": false,
     "NO_SCALE": false
   };
 
@@ -89,19 +92,23 @@ export class AnnotationToolsComponent implements OnInit {
   canDeleteAnnotation = this.userService.canDeleteAnnotation$;
 
   constructor(
-    private readonly service: AnnotationToolsService,
+    public readonly service: AnnotationToolsService,
     private readonly rxCoreService: RxCoreService,
-    private readonly userService: UserService) { }
+    private readonly userService: UserService,
+    private sessionContext: SessionContextService,
+    private readonly notificationService: NotificationService,
+  ) {
+  }
 
   ngOnInit(): void {
     this.guiConfig$.subscribe(config => {
       this.guiConfig = config;
 
       this.shapesAvailable = Number(!this.guiConfig.disableMarkupShapeRectangleButton)
-      + Number(!this.guiConfig.disableMarkupShapeRoundedRectangleButton)
-      + Number(!this.guiConfig.disableMarkupShapeEllipseButton)
-      + Number(!this.guiConfig.disableMarkupShapeCloudButton)
-      + Number(!this.guiConfig.disableMarkupShapePolygonButton);
+        + Number(!this.guiConfig.disableMarkupShapeRoundedRectangleButton)
+        + Number(!this.guiConfig.disableMarkupShapeEllipseButton)
+        + Number(!this.guiConfig.disableMarkupShapeCloudButton)
+        + Number(!this.guiConfig.disableMarkupShapePolygonButton);
     });
 
     this.rxCoreService.guiState$.subscribe(state => {
@@ -121,6 +128,21 @@ export class AnnotationToolsComponent implements OnInit {
       }
 
 
+    });
+
+    this.rxCoreService.guiMarkup$.subscribe(({markup, operation}) => {
+      this.annotation = markup;
+      this.operation = operation;
+      this.snap = RXCore.getSnapState();
+
+      if (operation.deleted) return;
+
+      if (
+        markup === -1
+        || markup.type == MARKUP_TYPES.CALLOUT.type && markup.subtype == MARKUP_TYPES.CALLOUT.subType
+        || markup.type == MARKUP_TYPES.SIGNATURE.type && markup.subtype == MARKUP_TYPES.SIGNATURE.subType
+        || markup.GetAttribute("Signature")?.value
+      ) return;
 
     });
 
@@ -136,10 +158,10 @@ export class AnnotationToolsComponent implements OnInit {
 
       if (markup === -1 || operation?.created) {
         const selectedAction = Object.entries(this.isActionSelected).find(([key, value]) => value);
-console.log('selectedAction', selectedAction)
+        console.log('selectedAction', selectedAction)
         //console.log("reset to default tool here");
-        if(operation?.created){
-
+        if (operation?.created) {
+          this.annotationCreated = true;
           this._deselectAllActions();
         }
         //this._deselectAllActions();
@@ -174,9 +196,8 @@ console.log('selectedAction', selectedAction)
     });
 
 
-
     this.service.snapState$.subscribe(state => {
-      if(state) {
+      if (state) {
         this.isActionSelected['SNAP'] = state;
       }
     });
@@ -213,6 +234,73 @@ console.log('selectedAction', selectedAction)
   }
 
 
+  showTooltip = false;
+  tooltipX = 0;
+  tooltipY = 0;
+  mouseMoveListener: any;
+  mouseUpListener: any;
+  showMouseTooltip = false;
+  mouseX = 0;
+  mouseY = 0;
+  pointerMoveListener: any;
+  pointerUpListener: any
+
+  startEllipseIssue(event?: MouseEvent) {
+    if (event) {
+
+      (event.target as HTMLElement)?.blur();
+
+      this.sessionContext.showTooltip(event.clientX, event.clientY, 'Drag your finger to mark the area of the issue');
+
+    }
+    setTimeout(() => {
+      document.addEventListener('pointermove', this.pointerMoveListener = (e: PointerEvent) => {
+        this.sessionContext.updateTooltipPosition(e.clientX, e.clientY);
+      });
+      document.addEventListener('pointerup', this.pointerUpListener = () => {
+        this.sessionContext.hideTooltip();
+        document.removeEventListener('pointermove', this.pointerMoveListener);
+        document.removeEventListener('pointerup', this.pointerUpListener);
+      });
+    }, 0);
+
+    this.onActionSelect('SHAPE_ELLIPSE');
+    this.notificationService.notification({message: 'Drag your finger to mark the area of the issue', type: 'info'});
+  }
+
+
+  updateTooltipPosition(event: MouseEvent): void {
+    // Update tooltip position as the mouse moves.
+    this.tooltipX = event.clientX;
+    this.tooltipY = event.clientY;
+  }
+
+  hideTooltip(): void {
+    // Hide the tooltip and clean up the event listeners.
+    this.showTooltip = false;
+    document.removeEventListener('mousemove', this.mouseMoveListener);
+    document.removeEventListener('mouseup', this.mouseUpListener);
+  }
+
+  ngOnDestroy(): void {
+    // Remove event listeners if the component is destroyed.
+    if (this.mouseMoveListener) {
+      document.removeEventListener('mousemove', this.mouseMoveListener);
+    }
+    if (this.mouseUpListener) {
+      document.removeEventListener('mouseup', this.mouseUpListener);
+    }
+  }
+
+
+  // @HostListener('document:mousemove', ['$event'])
+  // onMouseMove(e: MouseEvent) {
+  //   if (this.showMouseTooltip) {
+  //     this.mouseX = e.clientX;
+  //     this.mouseY = e.clientY;
+  //   }
+  // }
+
 
   openCustomIssueModal(): void {
     this.showIssueModal = true;
@@ -237,7 +325,7 @@ console.log('selectedAction', selectedAction)
     }
 
 
-    switch(actionName) {
+    switch (actionName) {
       case 'TEXT':
         RXCore.markUpTextRect(this.isActionSelected[actionName])
         break;
@@ -329,18 +417,18 @@ console.log('selectedAction', selectedAction)
         break;
 
       case 'SCALE_SETTING':
-          this.service.setMeasurePanelState({ visible: this.isActionSelected[actionName] });
-          break;
+        this.service.setMeasurePanelState({visible: this.isActionSelected[actionName]});
+        break;
 
       case 'IMAGES_LIBRARY':
-          this.service.setImagePanelState({ visible: this.isActionSelected[actionName] });
-          break;
+        this.service.setImagePanelState({visible: this.isActionSelected[actionName]});
+        break;
       case 'LINKS_LIBRARY':
-          this.service.setLinksPanelState({ visible: this.isActionSelected[actionName] });
-          break;
+        this.service.setLinksPanelState({visible: this.isActionSelected[actionName]});
+        break;
       case 'SYMBOLS_LIBRARY':
-          this.service.setSymbolPanelState({ visible: this.isActionSelected[actionName] });
-          break;
+        this.service.setSymbolPanelState({visible: this.isActionSelected[actionName]});
+        break;
 
       /*case 'CALIBRATE':
           //RXCore.calibrate(true);
@@ -354,33 +442,49 @@ console.log('selectedAction', selectedAction)
 
       case 'MEASURE_LENGTH':
 
-      //MeasureDetailPanelComponent
-        this.service.setMeasurePanelDetailState({ visible: this.isActionSelected[actionName], type: MARKUP_TYPES.MEASURE.LENGTH.type, created: true });
-        //this.annotationToolsService.setMeasurePanelState({ visible: true });
+        //MeasureDetailPanelComponent
+        this.service.setMeasurePanelDetailState({
+          visible: this.isActionSelected[actionName],
+          type: MARKUP_TYPES.MEASURE.LENGTH.type,
+          created: true
+        });
+        //this.service.setMeasurePanelState({ visible: true });
         //this.service.setPropertiesPanelState({ visible: this.isActionSelected[actionName], markup: MARKUP_TYPES.MEASURE.LENGTH,  readonly: false });
         RXCore.markUpDimension(this.isActionSelected[actionName], 0);
         break;
 
       case 'MEASURE_AREA':
-        this.service.setMeasurePanelDetailState({ visible: this.isActionSelected[actionName], type: MARKUP_TYPES.MEASURE.AREA.type, created: true });
+        this.service.setMeasurePanelDetailState({
+          visible: this.isActionSelected[actionName],
+          type: MARKUP_TYPES.MEASURE.AREA.type,
+          created: true
+        });
         //this.service.setPropertiesPanelState({ visible: this.isActionSelected[actionName], markup: MARKUP_TYPES.MEASURE.AREA, readonly: false });
         RXCore.markUpArea(this.isActionSelected[actionName]);
         break;
 
       case 'MEASURE_PATH':
-        this.service.setMeasurePanelDetailState({ visible: this.isActionSelected[actionName], type:  MARKUP_TYPES.MEASURE.PATH.type, created: true });
+        this.service.setMeasurePanelDetailState({
+          visible: this.isActionSelected[actionName],
+          type: MARKUP_TYPES.MEASURE.PATH.type,
+          created: true
+        });
         //this.service.setPropertiesPanelState({ visible: this.isActionSelected[actionName], markup:  MARKUP_TYPES.MEASURE.PATH, readonly: false });
         RXCore.markupMeasurePath(this.isActionSelected[actionName]);
         break;
       case 'MEASURE_RECTANGULAR_AREA':
-          this.service.setMeasurePanelDetailState({ visible: this.isActionSelected[actionName], type: MARKUP_TYPES.SHAPE.RECTANGLE.type, created: true });
-          RXCore.markupAreaRect(this.isActionSelected[actionName]);
-          break;
+        this.service.setMeasurePanelDetailState({
+          visible: this.isActionSelected[actionName],
+          type: MARKUP_TYPES.SHAPE.RECTANGLE.type,
+          created: true
+        });
+        RXCore.markupAreaRect(this.isActionSelected[actionName]);
+        break;
       case 'SNAP':
-          RXCore.changeSnapState(this.isActionSelected[actionName]);
-          break;
+        RXCore.changeSnapState(this.isActionSelected[actionName]);
+        break;
       case 'COUNT':
-        if(!this.isActionSelected[actionName]){
+        if (!this.isActionSelected[actionName]) {
           RXCore.markupCount(this.isActionSelected[actionName]);
         }
         break;
@@ -391,8 +495,7 @@ console.log('selectedAction', selectedAction)
       case 'NO_SCALE':
         RXCore.useNoScale(this.isActionSelected[actionName]);
         RXCore.markUpRedraw();
-       break;
-
+        break;
 
 
     }
@@ -404,10 +507,11 @@ console.log('selectedAction', selectedAction)
     }
   }
 
-  onAction (undo: boolean) {
+  onAction(undo: boolean) {
     if (undo) RXCore.markUpUndo();
     else RXCore.markUpRedo();
   }
+
   /*calibrate(selected) {
 
     RXCore.onGuiCalibratediag(onCalibrateFinished);
@@ -422,5 +526,19 @@ console.log('selectedAction', selectedAction)
 
     RXCore.calibrate(selected);
   }*/
+
+  operation: any;
+  annotation: any;
+  snap: any;
+
+  confirmAnnotation() {
+    if (this.annotation.type) {
+      this.annotationCreated = false;
+      this.service.setOpenIssueForm(true)
+      this.service.setPropertiesPanelState({visible: true, readonly: false});
+      RXCore.lockMarkup(true)
+    }
+  }
+
 
 }

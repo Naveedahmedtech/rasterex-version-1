@@ -25,172 +25,157 @@
   --body-overflow: hidden;
 }
 
-/* === Panel Container === */
 .properties-panel-container {
-  padding: 16px;
+  font-family: "Arial", sans-serif;
+}
+.properties-panel-container .block-section {
+  margin-bottom: 20px;
+}
+.properties-panel-container .block-section:last-child {
+  margin-bottom: 0;
+}
+.properties-panel-container .info-container {
   display: flex;
   flex-direction: column;
-  font-family: "Segoe UI", sans-serif;
-  color: #333;
+  gap: 10px;
 }
-
-/* === Section Block === */
-.block-section {
-  margin-bottom: 10px;
-}
-
-/* === Section Title === */
-.section-title {
-  font-size: 16px;
+.properties-panel-container .info-container .row-header {
   font-weight: 600;
-  margin-bottom: 10px;
-  color: #333c4e;
+  color: #333;
+  font-size: 0.95rem;
+  margin-bottom: 2px;
 }
-
-/* === Info Table === */
-.info-container {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: 8px;
-}
-.info-container .header {
-  font-weight: bold;
-  background-color: #f4f6f8;
-  padding: 8px;
-  border-radius: 4px;
-}
-.info-container .row-header {
-  font-weight: 500;
+.properties-panel-container .info-container .info-value {
   color: #444;
-  padding: 6px 8px;
-  background: #fafafa;
-  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  word-break: break-word;
 }
-.info-container div:not(.header):not(.row-header) {
-  padding: 6px 8px;
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+.properties-panel-container .info-container .preview-image {
+  max-width: 100%;
+  max-height: 200px;
+  margin-top: 8px;
+  border-radius: 8px;
+  display: block;
 }
-
-/* === Form Toggle === */
-.form-toggle {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  font-weight: 500;
-  padding: 8px 0;
-}
-.form-toggle span {
-  color: #007bff;
-}
-.form-toggle .icon-down::before,
-.form-toggle .icon-up::before {
-  content: "";
+.properties-panel-container .info-container .file-link {
   display: inline-block;
-  width: 0;
-  height: 0;
-  margin-left: 6px;
-  vertical-align: middle;
-  border-style: solid;
+  margin-top: 6px;
+  color: #1976d2;
+  font-weight: 500;
+  text-decoration: underline;
 }
-.form-toggle .icon-down::before {
-  border-width: 6px 5px 0 5px;
-  border-color: #007bff transparent transparent transparent;
+.properties-panel-container .info-container .image-error {
+  color: #b00020;
+  font-size: 0.9rem;
+  margin-top: 6px;
 }
-.form-toggle .icon-up::before {
-  border-width: 0 5px 6px 5px;
-  border-color: transparent transparent #007bff transparent;
+.properties-panel-container .info-container .image-error a {
+  display: inline-block;
+  margin-left: 4px;
+  color: #1976d2;
+  font-weight: 500;
 }
-
-/* === Form Fields === */
-.form-section {
-  margin-top: 12px;
-}
-.form-section .field {
+.properties-panel-container .form-section {
   display: flex;
   flex-direction: column;
-  margin-bottom: 16px;
+  gap: 14px;
 }
-.form-section .field label {
+.properties-panel-container .form-section .field {
+  display: flex;
+  flex-direction: column;
+}
+.properties-panel-container .form-section .field label {
+  font-weight: 600;
   margin-bottom: 4px;
-  font-weight: 500;
-  color: #444;
+  font-size: 0.95rem;
 }
-.form-section .field input,
-.form-section .field textarea {
-  padding: 8px 12px;
-  font-size: 14px;
+.properties-panel-container .form-section .field label .required {
+  color: red;
+}
+.properties-panel-container .form-section .field input,
+.properties-panel-container .form-section .field textarea {
+  padding: 10px;
+  font-size: 0.95rem;
+  border-radius: 8px;
   border: 1px solid #ccc;
-  border-radius: 6px;
-  transition: border-color 0.2s ease;
+  background-color: #fff8e1;
 }
-.form-section .field input:focus,
-.form-section .field textarea:focus {
-  border-color: #007bff;
+.properties-panel-container .form-section .field input:focus,
+.properties-panel-container .form-section .field textarea:focus {
   outline: none;
+  border-color: #ff9800;
 }
-.form-section .field textarea {
+.properties-panel-container .form-section .field textarea {
   resize: vertical;
   min-height: 80px;
 }
-
-/* === Alerts === */
-.alert {
-  padding: 10px 12px;
+.properties-panel-container .form-section .alert {
+  padding: 10px;
   border-radius: 6px;
-  margin-bottom: 12px;
-  font-size: 14px;
+  text-align: center;
+  font-size: 0.9rem;
 }
-.alert.success {
-  background-color: #d1e7dd;
-  color: #0f5132;
+.properties-panel-container .form-section .alert.success {
+  background-color: #dff0d8;
+  color: #3c763d;
 }
-.alert.error {
-  background-color: #f8d7da;
-  color: #842029;
+.properties-panel-container .form-section .alert.error {
+  background-color: #f2dede;
+  color: #a94442;
 }
-
-/* === Loading Spinner === */
-.loading-spinner {
-  font-size: 14px;
+.properties-panel-container .form-section .loading-spinner {
+  text-align: center;
   font-style: italic;
-  color: #555;
-  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: #666;
 }
-
-/* === Buttons === */
-.btn-group {
+.properties-panel-container .form-section .btn-group {
   display: flex;
-  gap: 12px;
-  justify-content: flex-end;
+  flex-direction: column;
+  gap: 10px;
 }
-.btn-group button {
-  padding: 8px 16px;
+.properties-panel-container .form-section .btn-group button {
+  padding: 12px;
+  font-size: 1rem;
   border: none;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: 10px;
+  font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s;
 }
-.btn-group button:first-child {
-  background-color: #007bff;
-  color: white;
-}
-.btn-group button:first-child:hover:not(:disabled) {
-  background-color: #0056b3;
-}
-.btn-group button:last-child {
-  background-color: #6c757d;
-  color: white;
-}
-.btn-group button:last-child:hover:not(:disabled) {
-  background-color: #5a6268;
-}
-.btn-group button:disabled {
+.properties-panel-container .form-section .btn-group button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+.properties-panel-container .form-section .btn-group button:first-child {
+  background-color: #ff9800;
+  color: white;
+}
+.properties-panel-container .form-section .btn-group button:first-child:hover:enabled {
+  background-color: #fb8c00;
+}
+.properties-panel-container .form-section .btn-group button:last-child {
+  background-color: #e0e0e0;
+  color: #333;
+}
+.properties-panel-container .form-section .btn-group button:last-child:hover:enabled {
+  background-color: #d5d5d5;
+}
+.properties-panel-container .delete-button {
+  background-color: #f44336;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.properties-panel-container .delete-button:hover {
+  background-color: #e53935;
 }
 
 /*# sourceMappingURL=properties-panel.component.css.map */

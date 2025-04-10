@@ -2,30 +2,23 @@
 <div class="annotation-tools-container" *ngIf="opened$ | async">
 
   <!-- ✅ Floating Create Issue Button -->
-  <button *ngIf="(canAddAnnotation | async) && !(guiConfig$ | async)?.disableMarkupShapeButton"
+  <button *ngIf="(canAddAnnotation | async) && !(guiConfig$ | async)?.disableMarkupShapeButton && !annotationCreated && !(service.openIssueForm$ | async)"
           class="create-issue-btn-floating"
-          (click)="openCustomIssueModal()">
+          (click)="startEllipseIssue($event)"
+  >
     Create Issue
   </button>
 
-  <!-- ✅ Custom Modal for Shape Selection -->
-  <div class="custom-modal-backdrop" *ngIf="showIssueModal">
-    <div class="custom-modal">
-      <h3>Select Shape</h3>
-      <div class="shape-option" (click)="selectIssueShape('SHAPE_ELLIPSE')">
-        <!-- Ellipse Icon -->
-        <svg width="40" height="40" viewBox="0 0 20 20" fill="none">
-          <circle cx="10" cy="10" r="8" stroke="#333C4E" stroke-width="2" />
-        </svg>
-        <span>Ellipse</span>
-      </div>
-      <button class="close-btn" (click)="closeIssueModal()">Cancel</button>
-    </div>
-  </div>
+  <button *ngIf="annotationCreated"
+          class="create-issue-btn-floating"
+          (click)="confirmAnnotation()"
+  >
+    Next
+  </button>
+
 
   <!-- 🧩 Annotation Panels -->
   <div class="annotation-panels-container">
-    <rx-properties-panel></rx-properties-panel>
     <!--<rx-note-panel></rx-note-panel>-->
     <rx-erase-panel></rx-erase-panel>
     <rx-count-panel *ngIf="isActionSelected['COUNT']"></rx-count-panel>
@@ -35,6 +28,7 @@
     <rx-links-library *ngIf="isActionSelected['LINKS_LIBRARY']" (onClose)="onActionSelect('LINKS_LIBRARY')"></rx-links-library>
     <rx-measure-panel></rx-measure-panel>
   </div>
+
 </div>
 
 <!-- 🛠️ Global Tools -->
@@ -43,4 +37,8 @@
 <rx-note-popover></rx-note-popover>
 <rx-note-popover [mode]="'tooltip'"></rx-note-popover>
 <rx-measure-detail-panel *ngIf="!(guiConfig$ | async).disableMarkupMeasureButton"></rx-measure-detail-panel>
+
+
+
+
 

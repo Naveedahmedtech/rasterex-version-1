@@ -109,7 +109,7 @@
                         background-color: #EDF1F2;
                         font-weight: bold;
                         font-size: 20px;
-                        display: inline-block; 
+                        display: inline-block;
                         width: 6px;
                         height: 6px;
                         border-radius: 50%;
@@ -222,7 +222,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1500; 
+    z-index: 1500;
 
     .progress {
         text-align: center;
@@ -233,18 +233,18 @@
             font-size: 15px;
             font-weight: 400;
         }
-    
+
         progress {
             width: 440px;
             height: 8px;
             margin-top: 20px;
             border-radius: 20px;
             border: 1px solid #ffffff47;
-    
+
             &::-webkit-progress-bar {
                 background-color: #FFFFFF;
             }
-    
+
             &::-webkit-progress-value {
                 background-color: $accent;
                 border-radius: 20px;
@@ -252,3 +252,6 @@
         }
     }
 }
+
+
+

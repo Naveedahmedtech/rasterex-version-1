@@ -1,41 +1,101 @@
 @import "../../../../assets/scss/config.scss";
-//::ng-deep .panel-container {
-//  transform: none !important;
-//}
 
-.panel-container {
-  min-width: 250px;
-  height: min-content;
-  box-shadow: 0px 0px 7px 2px #48484814;
-  position: absolute;
-  right: -105px;
-  bottom: 50%;
+.panel-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(6px);
+  background-color: rgba(0, 0, 0, 0.25);
+  z-index: 999;
 
-
-  .panel-header {
+  .panel-container {
+    width: 90vw;
+    max-width: 960px;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
     display: flex;
-    gap: 8px;
-    padding: 10px 14px;
-    background-color: #007bff;
-    color: #FFFFFF;
-    border-radius: 4px 4px 0 0;
-    font-size: 14px;
-    font-weight: 600;
+    flex-direction: column;
+    border-radius: 8px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
+    overflow: visible; // allow content height to grow naturally
+    background-color: #fff;
 
-    .title {
-      flex-grow: 1;
+    .panel-header {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 14px 20px;
+      background-color: #FFC107;
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 600;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+
+      .title {
+        flex-grow: 1;
+      }
+
+      .btn-close {
+        font-size: 24px;
+        font-weight: normal;
+        cursor: pointer;
+        line-height: 1;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: #333;
+        }
+      }
     }
 
-    .btn-close {
-      scale: 1.5;
-      font-weight: normal;
-      cursor: pointer;
+    .panel-body {
+      padding: 24px;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      overflow: visible; // prevent scrollbars
+      height: 400px;
     }
   }
+}
 
-  .panel-body {
-    background-color: #FFFFFF;
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
+/* === Responsive Behavior === */
+@media (max-width: 768px) {
+  .panel-backdrop {
+    .panel-container {
+      width: 95vw;
+    }
+
+    .panel-header {
+      font-size: 14px;
+      padding: 12px 16px;
+    }
+
+    .panel-body {
+      padding: 16px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .panel-backdrop {
+    .panel-container {
+      width: 98vw;
+      border-radius: 6px;
+    }
+
+    .panel-header {
+      font-size: 13px;
+      padding: 10px 14px;
+    }
+
+    .panel-body {
+      padding: 14px;
+    }
   }
 }

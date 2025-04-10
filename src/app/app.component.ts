@@ -11,6 +11,7 @@ import { Title } from '@angular/platform-browser';
 import { IGuiConfig } from 'src/rxcore/models/IGuiConfig';
 import { CollabService } from './services/collab.service';
 import { AnnotationStorageService } from './services/annotation-storage.service';
+import {SessionContextService} from "./services/session-context.service";
 
 
 
@@ -62,7 +63,9 @@ export class AppComponent implements AfterViewInit {
     private readonly userService: UserService,
     private readonly collabService: CollabService,
     private readonly annotationStorageService: AnnotationStorageService,
-    private titleService:Title) { }
+    private titleService:Title,
+    public tooltipService: SessionContextService
+    ) { }
 
   ngOnInit() {
 
@@ -600,7 +603,8 @@ export class AppComponent implements AfterViewInit {
     });
 
     RXCore.onGuiMarkupSave(() => {
-      this.notificationService.notification({message: 'Markups have been successfully saved.', type: 'success'});
+      // this.notificationService.notification({message: 'Issue created and saved successfully!', type: 'success'});
+      // this.notificationService.notification({message: 'Markups have been successfully saved.', type: 'success'});
     });
 
     RXCore.onGuiResize(() => {

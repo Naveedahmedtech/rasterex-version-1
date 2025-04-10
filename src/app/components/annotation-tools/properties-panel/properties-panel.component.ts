@@ -9,6 +9,7 @@ import {firstValueFrom} from "rxjs";
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 import {NEST_URL} from "../../../constants";
 import {SessionContextService} from "../../../services/session-context.service";
+import {NotificationService} from "../../notification/notification.service";
 
 @Component({
   selector: 'rx-properties-panel',
@@ -51,11 +52,19 @@ export class PropertiesPanelComponent implements OnInit {
   errorMessage: string;
 
   placeholder = ['Circle', 'Square', 'Triangle', 'Diamond'];
+  isFormCollapsed = true;
+  showForm = false;
+  showDetails = false
 
 
   formTitle: string = '';
   formDescription: string = '';
   private latestGuiMarkup: { markup: any; operation: any };
+
+  imagePreview: string | null = null;
+  base64Image: string | null = null;
+  imageError: boolean = false;
+
 
 
   constructor(
@@ -63,7 +72,8 @@ export class PropertiesPanelComponent implements OnInit {
     private readonly annotationToolsService: AnnotationToolsService,
     private readonly colorHelper: ColorHelper,
     private http: HttpClient,
-    private sessionContext: SessionContextService
+    private sessionContext: SessionContextService,
+    private readonly notificationService: NotificationService,
   ) {
   }
 
@@ -218,16 +228,33 @@ export class PropertiesPanelComponent implements OnInit {
     console.log(this.isFillOpacityVisible);
   }
 
-  isFormCollapsed = true;
 
   toggleForm() {
     this.isFormCollapsed = !this.isFormCollapsed;
   }
 
+  openForm(): void {
+    this.showForm = true;
+  }
+
+  hideForm() {
+    this.showForm = false;
+  }
+
+  openShowDetails() {
+    this.showDetails = true
+  }
+
+  hideShowDetails() {
+    this.showDetails = false
+  }
+
   operation: any;
   annotation: any;
+  issueId: string;
 
   ngOnInit(): void {
+    console.log('show form? ', this.showForm)
 
     //
     this.rxCoreService.guiMarkup$.subscribe(({markup, operation}) => {
@@ -243,55 +270,34 @@ export class PropertiesPanelComponent implements OnInit {
         || markup.type == MARKUP_TYPES.SIGNATURE.type && markup.subtype == MARKUP_TYPES.SIGNATURE.subType
         || markup.GetAttribute("Signature")?.value
       ) return;
-
-      if (this.operation?.created) {
+      const markupObj = (RXCore as any).getmarkupobjByGUID(markup.uniqueID);
+      const attributes = markupObj?.GetAttributes();
+      console.log('Markup Created: ? ', attributes && attributes.length > 0)
+      if (this.operation?.created && attributes && attributes.length > 0) {
+        console.log('Markup created: true')
         RXCore.selectMarkUp(true);
       }
 
-      switch (this.annotation.type) {
-        case MARKUP_TYPES.NOTE.type:
-          this.annotationToolsService.setNotePopoverState({visible: true, markup: this.annotation});
-          break;
-        case MARKUP_TYPES.ERASE.type:
-          if (this.annotation.subtype == MARKUP_TYPES.ERASE.subType) {
-            this.annotationToolsService.setErasePanelState({visible: true});
-          } else {
-            this.annotationToolsService.setPropertiesPanelState({visible: true, readonly: false});
+      if (this.annotation.type && attributes && attributes.length > 0) {
+        console.log("switch statement")
+        this.annotationToolsService.openIssueForm$.subscribe((created) => {
+          console.log('created', created)
+          if (created) {
+            this.showForm = true;
           }
-          break;
-        case MARKUP_TYPES.ARROW.type:
-          if (this.annotation.subType != MARKUP_TYPES.CALLOUT.subType) {
-            //this.annotationToolsService.setContextPopoverState({ visible : true });
-            this.annotationToolsService.setPropertiesPanelState({visible: true});
-          }
-          break;
-        case MARKUP_TYPES.MEASURE.LENGTH.type:
-          this.annotationToolsService.setPropertiesPanelState({visible: true});
-          break;
-        case MARKUP_TYPES.MEASURE.AREA.type:
-          if (this.annotation.subtype == MARKUP_TYPES.MEASURE.AREA.subType) {
-            this.annotationToolsService.setPropertiesPanelState({visible: true});
-          }
-          break;
-        case MARKUP_TYPES.MEASURE.PATH.type:
-        case MARKUP_TYPES.PAINT.POLYLINE.type:
-          if (this.annotation.subtype == MARKUP_TYPES.MEASURE.PATH.subType) {
-            this.annotationToolsService.setPropertiesPanelState({visible: true});
-          }
-          if (this.annotation.subtype == MARKUP_TYPES.PAINT.POLYLINE.subType) {
-            this.annotationToolsService.setPropertiesPanelState({visible: true, readonly: false});
-          }
-          if (this.annotation.subtype == MARKUP_TYPES.SHAPE.POLYGON.subType) {
-            this.annotationToolsService.setPropertiesPanelState({visible: true, readonly: false});
-          }
-
-          break;
-        default:
-          this.annotationToolsService.setPropertiesPanelState({visible: true, readonly: false});
-          break;
+        })
+        this.annotationToolsService.setPropertiesPanelState({visible: true, readonly: false});
       }
-
-
+      else {
+        console.log(" I am in else condition")
+        this.annotationToolsService.openIssueForm$.subscribe((created) => {
+          console.log('created', created)
+          if (created) {
+            this.showForm = true;
+            this.annotationToolsService.setPropertiesPanelState({visible: true, readonly: false});
+          }
+        })
+     }
     });
 
 
@@ -347,6 +353,7 @@ export class PropertiesPanelComponent implements OnInit {
       this.fillOpacity = markup.transparency;
       this.displayName = markup.GetAttributes()?.find(a => a.name == 'displayName')?.value;
       this.lengthMeasureType = markup.subtype;
+      this.issueId = (RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes()?.find((att) => att.name === 'issueId')?.value
       console.log('attributes---> ', markup.uniqueID, (RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes())
       this.formTitle = (RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes()?.find((att) => att.name === 'title')?.value || '';
       this.infoData = {
@@ -354,7 +361,8 @@ export class PropertiesPanelComponent implements OnInit {
         'Author:': this.sessionContext.username,
         'Time:': (markup as any).GetDateTime(true),
         'title': (RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes()?.find((att) => att.name === 'title')?.value,
-        'description': (markup as any).GetAttributes()?.find((att) => att.name === 'description')?.value
+        'description': (RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes()?.find((att) => att.name === 'description')?.value,
+        'file': NEST_URL + '/' +(RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes()?.find((att) => att.name === 'filePath')?.value
       };
 
       if (markup.type == MARKUP_TYPES.COUNT.type) {
@@ -434,12 +442,26 @@ export class PropertiesPanelComponent implements OnInit {
       title: this.formTitle,
       description: this.formDescription,
       projectId: this.sessionContext.projectId,
-      userId: this.sessionContext.userId
+      userId: this.sessionContext.userId,
+      image: this.base64Image || null
     })
-      .then(() => {
+      .then((response:any) => {
+        // ✅ Add issueId to markup attributes
+        markupObj.customattributes.push({name: 'issueId', value: response.id});
+        if(response.file) {
+          markupObj.customattributes.push({name: 'filePath', value: response.file.filePath});
+          this.infoData['file'] = `${NEST_URL}/${response.file.filePath}`;
+        }
+
+        this.issueId = response.id;
         RXCore.markUpSave();
-        this.successMessage = '✅ Issue created and saved successfully!';
-        console.log("✅ Issue created");
+
+        this.formTitle = '';
+        this.formDescription = '';
+        this.visible = false;
+        this.annotationToolsService.setOpenIssueForm(false);
+        this.showForm = false;
+        this.notificationService.notification({message: 'Annotation Deleted Successfully!', type: 'success'});
       })
       .catch((error) => {
         RXCore.markUpSave(); // still save even if issue fails
@@ -449,6 +471,9 @@ export class PropertiesPanelComponent implements OnInit {
       .finally(() => {
         this.isLoading = false;
       });
+  }
+  isValidImageUrl(url: string): boolean {
+    return Boolean(url && !url.endsWith('/undefined') && !url.includes('undefined'));
   }
 
 
@@ -558,7 +583,7 @@ export class PropertiesPanelComponent implements OnInit {
     return new Promise((resolve, reject) => {
       const headers = new HttpHeaders();
       this.http
-        .post<{ data: { id: string } }>(
+        .post<any>(
           `${NEST_URL}/api/v1/issue/create`,
           data,
           {headers}
@@ -566,7 +591,7 @@ export class PropertiesPanelComponent implements OnInit {
         .subscribe({
           next: (response) => {
             console.log('Issue created successfully:', response?.data?.id);
-            resolve(response?.data?.id); // ✅ Return the issueId
+            resolve(response?.data); // ✅ Return the issueId
           },
           error: (error) => {
             console.error('Error creating issue:', error);
@@ -670,4 +695,91 @@ export class PropertiesPanelComponent implements OnInit {
     this.visible = false;
     RXCore.selectMarkUp(false);
   }
+
+  onDelete() {
+    this.rxCoreService.guiMarkup$.subscribe(({markup, operation}) => {
+      if (operation?.created) {
+        RXCore.selectMarkUp(true);
+      }
+    })
+    this.deleteIssue().then((response) => {
+      if(response) {
+          RXCore.deleteMarkUp()
+          RXCore.markUpSave()
+      }
+    });
+    this.visible = false;
+    this.notificationService.notification({message: 'Annotation Deleted Successfully!', type: 'success'});
+  }
+
+  deleteIssue() {
+    return new Promise((resolve, reject) => {
+      const headers = new HttpHeaders();
+      this.http
+        .delete(
+          `${NEST_URL}/api/v1/issue/${this.issueId}`,
+          {headers}
+        )
+        .subscribe({
+          next: (response) => {
+            console.log('Issue deleted successfully:', response);
+            resolve(true)
+          },
+          error: (error) => {
+            console.error('Error creating issue:', error);
+            reject(error);
+          },
+        });
+    });
+  }
+
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        console.log("---> Trying to upload the Annotation: ", e.target.result);
+        this.imagePreview = e.target.result; // Convert image to base64 for preview
+        const img = new Image();
+        img.src = e.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxWidth = 800; // Resize width (adjust if needed)
+          const maxHeight = 800; // Resize height (adjust if needed)
+          let width = img.width;
+          let height = img.height;
+
+          // Resize logic
+          if (width > maxWidth || height > maxHeight) {
+            if (width > height) {
+              height *= maxWidth / width;
+              width = maxWidth;
+            } else {
+              width *= maxHeight / height;
+              height = maxHeight;
+            }
+          }
+
+          // Set canvas size
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          // Get MIME type based on file extension
+          const fileType = file.type || 'image/jpeg'; // Default to JPEG if type is missing
+
+          // Convert to Base64 format (keeping prefix for backend)
+          this.base64Image = canvas.toDataURL(fileType, 0.7); // Compress image to 70% quality
+          console.log("base64", this.base64Image)
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+
+
+
 }

@@ -1,4 +1,6 @@
+<rx-properties-panel></rx-properties-panel>
 <app-message-broker />
+<!--<app-global-tooltip></app-global-tooltip>-->
 
 <top-nav-menu style="z-index: 3; position: fixed; top: 0; left: 0; width: 100%;" [class.hidden]="(guiConfig$ | async).disableTopNavMenu" [state]="state" [ngStyle]="{'filter': eventUploadFile ? 'blur(3px)' : 'none' }"></top-nav-menu>
 <side-nav-menu style="z-index: 2; position: fixed; top: 49px; left: 0; height: calc(100% - 49px);" *ngIf="!(guiConfig$ | async).disableSideNavMenu"></side-nav-menu>
@@ -70,4 +72,26 @@
 
 <file-info />
 
+<!-- Tooltip that follows the cursor -->
+<div class="tooltip" *ngIf="tooltipService.show " [ngStyle]="{'left.px': (tooltipService.position | async)?.x, 'top.px': (tooltipService.position | async)?.y}">
+  Drag where the issue is
+</div>
+
+
 <app-align-feature-tutorial />
+
+
+<!--&lt;!&ndash; 🖱️ Floating Mouse Tooltip &ndash;&gt;-->
+<!--<div class="floating-instruction"-->
+<!--     *ngIf="showMouseTooltip"-->
+<!--     [ngStyle]="{ top: mouseY + 'px', left: mouseX + 'px' }">-->
+<!--  Drag your finger to mark the area of the issue-->
+<!--</div>-->
+<!--<div class="floating-instruction"-->
+<!--     *ngIf="tooltipService.show | async"-->
+<!--     [ngStyle]="{-->
+<!--       top: (tooltipService.position | async)?.y + 'px',-->
+<!--       left: (tooltipService.position | async)?.x + 'px'-->
+<!--     }">-->
+<!--  Drag your finger to mark the area of the issue-->
+<!--</div>-->

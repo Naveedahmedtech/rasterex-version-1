@@ -1,35 +1,86 @@
 <rx-panel *ngIf="visible" title="Issue Details" (onClose)="onClose()">
-
   <div class="properties-panel-container">
 
     <!-- Info Section: visible only when the form is collapsed -->
-    <div *ngIf="isFormCollapsed && isInfoTabVisible" class="block-section">
+    <div *ngIf="!showForm" class="block-section">
       <div class="info-container">
         <ng-container *ngFor="let item of infoData | keyvalue">
           <div class="row-header">{{ item.key }}</div>
-          <div>{{ item.value }}</div>
+
+          <!-- Textual values -->
+          <div *ngIf="item.key !== 'file'" class="info-value">
+            {{ item.value }}
+          </div>
+
+          <!-- File/Image Preview -->
+          <div *ngIf="item.key === 'file'">
+            <ng-container *ngIf="isValidImageUrl(item.value); else fallback">
+              <a [href]="item.value" target="_blank">
+                <img
+                  [src]="item.value"
+                  alt="Attached Issue File"
+                  (error)="imageError = true"
+                  *ngIf="!imageError"
+                  class="preview-image"
+                />
+              </a>
+            </ng-container>
+
+            <!-- Fallback display -->
+            <ng-template #fallback>
+              <div class="image-error">
+                No preview available.
+                <a *ngIf="item.value" [href]="item.value" target="_blank" rel="noopener">Open File</a>
+              </div>
+            </ng-template>
+          </div>
         </ng-container>
+      </div>
+
+
+      <!-- Delete Button -->
+      <div class="btn-group" style="justify-content: flex-start; margin-top: 12px;" *ngIf="formTitle">
+        <button class="delete-button" (click)="onDelete()" aria-label="Delete Issue">
+          Delete
+        </button>
       </div>
     </div>
 
-
     <!-- Form Block -->
-    <!-- Form Block: hidden if title exists -->
-    <div class="block-section">
-      <div class="form-toggle" (click)="toggleForm()">
-        <span>{{ isFormCollapsed ? 'Add issue details' : 'Show info details' }}</span>
-        <i [ngClass]="isFormCollapsed ? 'icon-down' : 'icon-up'"></i>
-      </div>
-
-      <div class="form-section" *ngIf="!isFormCollapsed">
+    <div class="block-section" *ngIf="showForm">
+      <div class="form-section">
+        <!-- Title Field -->
         <section class="field">
           <label for="formTitle">Title <span class="required">*</span></label>
-          <input id="formTitle" type="text" [(ngModel)]="formTitle" placeholder="Enter title" />
+          <input
+            id="formTitle"
+            type="text"
+            [(ngModel)]="formTitle"
+            placeholder="Enter title"
+            aria-required="true"
+          />
         </section>
 
+        <!-- Description Field -->
         <section class="field">
           <label for="formDescription">Description</label>
-          <textarea id="formDescription" [(ngModel)]="formDescription" placeholder="Enter description"></textarea>
+          <textarea
+            id="formDescription"
+            [(ngModel)]="formDescription"
+            placeholder="Enter description"
+          ></textarea>
+        </section>
+
+        <!-- Capture Image from Camera -->
+        <section class="field">
+          <label for="issue-image">Attach Image (Take Photo)</label>
+          <input
+            type="file"
+            id="issue-image"
+            (change)="onFileSelected($event)"
+            accept="image/*"
+            capture="environment"
+          />
         </section>
 
         <!-- Messages -->
@@ -37,10 +88,14 @@
         <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
         <div *ngIf="isLoading" class="loading-spinner">Saving...</div>
 
-        <!-- Buttons -->
+        <!-- Action Buttons -->
         <div class="btn-group">
-          <button (click)="onSave()" [disabled]="isLoading || !formTitle">Save</button>
-          <button (click)="onCancel()" [disabled]="isLoading">Cancel</button>
+          <button (click)="onSave()" [disabled]="isLoading || !formTitle">
+            Save
+          </button>
+          <button (click)="onCancel()" [disabled]="isLoading">
+            Cancel
+          </button>
         </div>
       </div>
     </div>
