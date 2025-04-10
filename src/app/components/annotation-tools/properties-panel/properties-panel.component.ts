@@ -66,7 +66,6 @@ export class PropertiesPanelComponent implements OnInit {
   imageError: boolean = false;
 
 
-
   constructor(
     private readonly rxCoreService: RxCoreService,
     private readonly annotationToolsService: AnnotationToolsService,
@@ -287,8 +286,7 @@ export class PropertiesPanelComponent implements OnInit {
           }
         })
         this.annotationToolsService.setPropertiesPanelState({visible: true, readonly: false});
-      }
-      else {
+      } else {
         console.log(" I am in else condition")
         this.annotationToolsService.openIssueForm$.subscribe((created) => {
           console.log('created', created)
@@ -297,7 +295,7 @@ export class PropertiesPanelComponent implements OnInit {
             this.annotationToolsService.setPropertiesPanelState({visible: true, readonly: false});
           }
         })
-     }
+      }
     });
 
 
@@ -362,7 +360,7 @@ export class PropertiesPanelComponent implements OnInit {
         'Time:': (markup as any).GetDateTime(true),
         'title': (RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes()?.find((att) => att.name === 'title')?.value,
         'description': (RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes()?.find((att) => att.name === 'description')?.value,
-        'file': NEST_URL + '/' +(RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes()?.find((att) => att.name === 'filePath')?.value
+        'file': NEST_URL + '/' + (RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes()?.find((att) => att.name === 'filePath')?.value
       };
 
       if (markup.type == MARKUP_TYPES.COUNT.type) {
@@ -445,10 +443,10 @@ export class PropertiesPanelComponent implements OnInit {
       userId: this.sessionContext.userId,
       image: this.base64Image || null
     })
-      .then((response:any) => {
+      .then((response: any) => {
         // ✅ Add issueId to markup attributes
         markupObj.customattributes.push({name: 'issueId', value: response.id});
-        if(response.file) {
+        if (response.file) {
           markupObj.customattributes.push({name: 'filePath', value: response.file.filePath});
           this.infoData['file'] = `${NEST_URL}/${response.file.filePath}`;
         }
@@ -461,6 +459,17 @@ export class PropertiesPanelComponent implements OnInit {
         this.visible = false;
         this.annotationToolsService.setOpenIssueForm(false);
         this.showForm = false;
+        // ✅ Send postMessage to parent (React)
+        window.parent.postMessage({
+          type: 'ISSUE_SAVE',
+          payload: {
+            status: 'success',
+            timestamp: new Date().toISOString(),
+            signedBy: this.sessionContext.username,
+            orderId: this.sessionContext.orderId,
+            fileId: this.sessionContext.projectId, // or actual file ID if you have it
+          }
+        }, '*');
         this.notificationService.notification({message: 'Annotation Deleted Successfully!', type: 'success'});
       })
       .catch((error) => {
@@ -472,6 +481,7 @@ export class PropertiesPanelComponent implements OnInit {
         this.isLoading = false;
       });
   }
+
   isValidImageUrl(url: string): boolean {
     return Boolean(url && !url.endsWith('/undefined') && !url.includes('undefined'));
   }
@@ -703,9 +713,20 @@ export class PropertiesPanelComponent implements OnInit {
       }
     })
     this.deleteIssue().then((response) => {
-      if(response) {
-          RXCore.deleteMarkUp()
-          RXCore.markUpSave()
+      if (response) {
+        RXCore.deleteMarkUp()
+        RXCore.markUpSave()
+        // ✅ Send postMessage to parent (React)
+        window.parent.postMessage({
+          type: 'ISSUE_SAVE',
+          payload: {
+            status: 'success',
+            timestamp: new Date().toISOString(),
+            signedBy: this.sessionContext.username,
+            orderId: this.sessionContext.orderId,
+            fileId: this.sessionContext.projectId, // or actual file ID if you have it
+          }
+        }, '*');
       }
     });
     this.visible = false;
@@ -778,8 +799,6 @@ export class PropertiesPanelComponent implements OnInit {
       reader.readAsDataURL(file);
     }
   }
-
-
 
 
 }

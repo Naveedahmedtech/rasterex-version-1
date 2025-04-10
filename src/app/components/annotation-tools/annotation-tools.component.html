@@ -1,25 +1,53 @@
 <!-- Annotation Tools Container -->
-<div class="annotation-tools-container" *ngIf="opened$ | async">
+<div class="annotation-tools-container" *ngIf="(opened$ | async) && sessionContext.isFileReady">
 
-  <!-- ✅ Floating Create Issue Button -->
-  <button *ngIf="(canAddAnnotation | async) && !(guiConfig$ | async)?.disableMarkupShapeButton && !annotationCreated && !(service.openIssueForm$ | async)"
-          class="create-issue-btn-floating"
-          (click)="startEllipseIssue($event)"
+  <!-- ✅ Create Issue Button -->
+  <button
+    *ngIf="(canAddAnnotation | async) && !(guiConfig$ | async)?.disableMarkupShapeButton && !annotationCreated && !(service.openIssueForm$ | async) && mode === 'annotation'"
+    class="create-issue-btn-floating button-fixed-bottom"
+    (click)="startEllipseIssue($event)"
   >
     Create Issue
   </button>
 
-  <button *ngIf="annotationCreated"
-          class="create-issue-btn-floating"
+  <!-- ✅ Signature Buttons (Create, Save, Delete) -->
+  <div *ngIf="!sessionContext.isSigned && mode === 'signature' && !signaturedSaved">
+
+    <button
+      *ngIf="(canAddAnnotation | async) && !(guiConfig$ | async)?.disableMarkupShapeButton && !annotationCreated && !(service.openIssueForm$ | async) && !signatureCreated"
+      class="create-issue-btn-floating button-fixed-bottom"
+      (click)="startSignature()"
+    >
+      Create Signature
+    </button>
+
+    <div class="signature-button-group" *ngIf="signatureCreated">
+      <button
+        class="create-issue-btn-floating"
+        [disabled]="savingSignature"
+        (click)="saveSignature()">
+        <ng-container *ngIf="!savingSignature">Save</ng-container>
+        <ng-container *ngIf="savingSignature">
+          <span class="spinner"></span> Saving...
+        </ng-container>
+      </button>
+
+
+      <button class="create-issue-btn-floating delete" (click)="deleteSignature()">Reset</button>
+    </div>
+
+  </div>
+
+  <!-- ✅ Confirm Annotation Button -->
+  <button *ngIf="annotationCreated && mode === 'annotation'"
+          class="create-issue-btn-floating button-fixed-bottom"
           (click)="confirmAnnotation()"
   >
     Next
   </button>
 
-
   <!-- 🧩 Annotation Panels -->
   <div class="annotation-panels-container">
-    <!--<rx-note-panel></rx-note-panel>-->
     <rx-erase-panel></rx-erase-panel>
     <rx-count-panel *ngIf="isActionSelected['COUNT']"></rx-count-panel>
     <rx-stamp-panel *ngIf="isActionSelected['STAMP']" (onClose)="onActionSelect('STAMP')"></rx-stamp-panel>
@@ -37,8 +65,3 @@
 <rx-note-popover></rx-note-popover>
 <rx-note-popover [mode]="'tooltip'"></rx-note-popover>
 <rx-measure-detail-panel *ngIf="!(guiConfig$ | async).disableMarkupMeasureButton"></rx-measure-detail-panel>
-
-
-
-
-

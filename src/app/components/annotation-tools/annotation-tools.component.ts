@@ -8,6 +8,9 @@ import {UserService} from '../user/user.service';
 import {firstValueFrom, lastValueFrom} from 'rxjs';
 import {SessionContextService} from "../../services/session-context.service";
 import {NotificationService} from "../notification/notification.service";
+import {GuiMode} from "../../../rxcore/enums/GuiMode";
+import {HttpClient, HttpHeaders} from "@angular/common/http";
+import {NEST_URL} from "../../constants";
 
 
 @Component({
@@ -23,6 +26,12 @@ export class AnnotationToolsComponent implements OnInit {
   shapesAvailable: number = 5;
   showIssueModal = false;
   annotationCreated: boolean = false;
+  mode: string;
+  signatureCreated: boolean = false;
+
+  operation: any;
+  annotation: any;
+  snap: any;
 
 
   isActionSelected = {
@@ -95,12 +104,15 @@ export class AnnotationToolsComponent implements OnInit {
     public readonly service: AnnotationToolsService,
     private readonly rxCoreService: RxCoreService,
     private readonly userService: UserService,
-    private sessionContext: SessionContextService,
+    public sessionContext: SessionContextService,
     private readonly notificationService: NotificationService,
+    private http: HttpClient,
   ) {
   }
 
   ngOnInit(): void {
+console.log('SELLL----kjdsf===ksdjf==++', this.rxCoreService.getSelectedMarkup())
+
     this.guiConfig$.subscribe(config => {
       this.guiConfig = config;
 
@@ -131,22 +143,18 @@ export class AnnotationToolsComponent implements OnInit {
     });
 
     this.rxCoreService.guiMarkup$.subscribe(({markup, operation}) => {
-      this.annotation = markup;
-      this.operation = operation;
-      this.snap = RXCore.getSnapState();
-
-      if (operation.deleted) return;
-
-      if (
-        markup === -1
-        || markup.type == MARKUP_TYPES.CALLOUT.type && markup.subtype == MARKUP_TYPES.CALLOUT.subType
-        || markup.type == MARKUP_TYPES.SIGNATURE.type && markup.subtype == MARKUP_TYPES.SIGNATURE.subType
-        || markup.GetAttribute("Signature")?.value
-      ) return;
-
-    });
+      console.log("-23482359=-0dfgkj")
+      if (markup !== -1) {
+        if (markup.type == MARKUP_TYPES.COUNT.type) return;
+        if (markup.type == MARKUP_TYPES.STAMP.type) {
+          if (operation?.created) return;
+          this.isActionSelected["STAMP"] = false;
+        }
+      }
+    })
 
     this.rxCoreService.guiMarkup$.subscribe(({markup, operation}) => {
+      console.log('Operation created!', {markup, operation});
       if (markup !== -1) {
         if (markup.type == MARKUP_TYPES.COUNT.type) return;
         if (markup.type == MARKUP_TYPES.STAMP.type) {
@@ -223,7 +231,9 @@ export class AnnotationToolsComponent implements OnInit {
       }*/
     });
 
-    console.log("deselect all called");
+    this.mode = this.sessionContext.mode!;
+
+
     RXCore.restoreDefault();
     //this.service.hideQuickActionsMenu();
     //this.service.setNotePanelState({ visible: false });
@@ -243,7 +253,9 @@ export class AnnotationToolsComponent implements OnInit {
   mouseX = 0;
   mouseY = 0;
   pointerMoveListener: any;
-  pointerUpListener: any
+  pointerUpListener: any;
+  savingSignature: boolean = false;
+  signaturedSaved: boolean = false;
 
   startEllipseIssue(event?: MouseEvent) {
     if (event) {
@@ -268,7 +280,76 @@ export class AnnotationToolsComponent implements OnInit {
     this.notificationService.notification({message: 'Drag your finger to mark the area of the issue', type: 'info'});
   }
 
+  startSignature() {
+    this.notificationService.notification({ message: 'Draw the signature!', type: 'info'})
+    this.onActionSelect('PAINT_FREEHAND')
+    this.signatureCreated = true;
+  }
+  saveSignature() {
+    this.savingSignature = true;
 
+    this.saveSignatureToServer().then(() => {
+      RXCore.markUpFreePen(false);
+      RXCore.lockMarkup(true);
+      RXCore.markUpSave();
+
+      this.signaturedSaved = true;
+
+      this.notificationService.notification({
+        message: 'Signature created successfully!',
+        type: 'success'
+      });
+
+      // ✅ Send postMessage to parent (React)
+      window.parent.postMessage({
+        type: 'SIGNATURE_SAVE',
+        payload: {
+          status: 'success',
+          timestamp: new Date().toISOString(),
+          signedBy: this.sessionContext.username,
+          orderId: this.sessionContext.orderId,
+          fileId: this.sessionContext.projectId, // or actual file ID if you have it
+        }
+      }, '*'); // You can restrict origin instead of '*'
+
+    }).catch((error) => {
+      console.log(error);
+    }).finally(() => {
+      this.savingSignature = false;
+    });
+  }
+
+  guids: string[];
+  deleteSignature() {
+    RXCore.markUpFreePen(false)
+    RXCore.lockMarkup(true)
+    this.guids = RXCore.getmarkupGUIDs()
+    for (const guid of this.guids) {
+      RXCore.deleteMarkupbyGUID(guid)
+    }
+    this.startSignature()
+  }
+  saveSignatureToServer() {
+    // Return issueId
+    return new Promise((resolve, reject) => {
+      const headers = new HttpHeaders();
+      this.http
+        .patch<any>(
+          `${NEST_URL}/api/v1/universal/order/${this.sessionContext.orderId}/file`,
+          {headers}
+        )
+        .subscribe({
+          next: (response) => {
+            console.log('Issue created successfully:', response?.data?.id);
+            resolve(response?.data); // ✅ Return the issueId
+          },
+          error: (error) => {
+            console.error('Error creating issue:', error);
+            reject(error);
+          },
+        });
+    });
+  }
   updateTooltipPosition(event: MouseEvent): void {
     // Update tooltip position as the mouse moves.
     this.tooltipX = event.clientX;
@@ -527,17 +608,14 @@ export class AnnotationToolsComponent implements OnInit {
     RXCore.calibrate(selected);
   }*/
 
-  operation: any;
-  annotation: any;
-  snap: any;
 
   confirmAnnotation() {
-    if (this.annotation.type) {
+    // if (this.annotation && this.annotation.type) {
       this.annotationCreated = false;
       this.service.setOpenIssueForm(true)
       this.service.setPropertiesPanelState({visible: true, readonly: false});
       RXCore.lockMarkup(true)
-    }
+    // }
   }
 
 

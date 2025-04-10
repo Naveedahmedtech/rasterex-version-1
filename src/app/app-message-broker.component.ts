@@ -41,7 +41,7 @@ export class AppMessageBrokerComponent implements OnInit {
             console.log("post message received!", event.data);
             RXCore.setUser(event.data.metadata.userId, event.data.metadata.username)
             parent.postMessage({ type: "progressStart", message: "It takes a few seconds to open the file." }, "*");
-            this.sessionContext.setUserContext(event.data.metadata.userId, event.data.metadata.projectId, event.data.metadata.username);
+            this.sessionContext.setUserContext(event.data.metadata.userId, event.data.metadata?.projectId, event.data.metadata.username, event.data.metadata?.orderId, event.data.metadata.mode, event.data.metadata.isSigned);
             RXCore.setinitFile(event.data.payload);
             await firstValueFrom(this.rxCoreService.guiFileLoadComplete$);
             parent.postMessage({ type: "progressEnd" }, "*");

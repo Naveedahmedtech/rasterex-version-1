@@ -1,0 +1,239 @@
+:root {
+  --accent: #31BD59;
+  --accent-secondary: #F0F7F9;
+  --main: #333C4E;
+  --secondary: #A4ABAE;
+  --light-secondary: #EDF1F2;
+  --inactive: #DBDBDB;
+  --background: #D6DADC;
+  --background-light: #F0F7F9;
+  --background-secondary: #F5F5F5;
+  --side-nav-background: #F0F7F9;
+  --side-nav-background-active: #FFFFFF;
+  --side-nav-color: #A6ADB0;
+  --side-nav-color-active: #31BD59;
+  --side-nav-panel-background: #FFFFFF;
+  --top-nav-background: #FFFFFF;
+  --top-nav-color: #333C4E;
+  --top-nav-background-active: #F0F7F9;
+  --top-nav-color-active: #333C4E;
+  --top-nav-border-bottom-color-active: transparent;
+  --toolbar-background: #FFFFFF;
+  --toolbar-color: #333C4E;
+  --toolbar-background-active: #31BD59;
+  --logo-height: auto;
+  --body-overflow: hidden;
+}
+
+:host {
+  color: var(--toolbar-color);
+}
+
+.bottom-toolbar-container {
+  display: flex;
+  gap: 8px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 25%;
+  align-items: center;
+  justify-content: center;
+}
+.bottom-toolbar-container .disabled {
+  opacity: 0.5;
+}
+.bottom-toolbar-container ul.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  height: 44px;
+  border-radius: 4px;
+  gap: 18px;
+  background: var(--toolbar-background);
+  box-shadow: 0px 0px 8px 0px rgba(51, 60, 78, 0.2);
+  list-style: unset;
+  list-style-type: none;
+  margin: 0;
+}
+.bottom-toolbar-container ul.toolbar li {
+  display: flex;
+}
+.bottom-toolbar-container ul.toolbar li:not(.separator, .slider, .slider-grayscale) {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  padding: 4px;
+  cursor: pointer;
+  transition: 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bottom-toolbar-container ul.toolbar li:not(.separator, .slider, .slider-grayscale):hover {
+  background-color: var(--background-light);
+}
+.bottom-toolbar-container ul.toolbar li:not(.separator, .slider, .slider-grayscale).selected {
+  background-color: var(--toolbar-background-active);
+}
+.bottom-toolbar-container ul.toolbar li:not(.separator, .slider, .slider-grayscale).selected svg:not(.ignore-filter) {
+  filter: brightness(0) invert(1);
+}
+.bottom-toolbar-container ul.toolbar li.separator {
+  width: 1px;
+  height: 32px;
+  background-color: #EDF1F2;
+}
+.bottom-toolbar-container ul.toolbar li.slider {
+  width: 108px;
+  background-color: #EDF1F2;
+  align-items: center;
+  height: 28px;
+  border-radius: 4px;
+  padding: 0 10px;
+  margin-left: -16px;
+}
+.bottom-toolbar-container ul.toolbar li.slider-grayscale {
+  width: 108px;
+  height: 28px;
+  border-radius: 4px;
+  padding: 0 10px;
+  margin-left: -16px;
+  margin-top: 18px;
+}
+.bottom-toolbar-container .pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  padding: 0 14px;
+  border-radius: 4px;
+  gap: 4px;
+  background: #FFFFFF;
+  box-shadow: 0px 0px 8px 0px rgba(51, 60, 78, 0.2);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+}
+.bottom-toolbar-container .pagination svg:not(.disabled) {
+  cursor: pointer;
+}
+.bottom-toolbar-container .pagination svg.disabled {
+  cursor: not-allowed;
+}
+.bottom-toolbar-container .pagination input[type=text] {
+  color: var(--toolbar-color);
+  background: transparent;
+  border: 1px solid #EDF1F2;
+  border-radius: 4px;
+  width: 30px;
+  line-height: 28px;
+  text-align: center;
+  box-sizing: border-box;
+  outline: none;
+  transition: 0.3s;
+  background: transparent;
+}
+.bottom-toolbar-container .pagination input[type=text]:focus {
+  border-color: var(--main);
+}
+
+.birdseye-panel {
+  position: fixed;
+  top: 60px;
+  left: 100px;
+}
+.birdseye-panel .birdseye-panel-container {
+  position: relative;
+}
+.birdseye-panel .birdseye-panel-container canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.cross-section-panel {
+  position: fixed;
+  top: 60px;
+  right: 10px;
+}
+.cross-section-panel .cross-section-container {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 16px;
+}
+.cross-section-panel .cross-section-container .section {
+  padding: 20px 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.search-text-panel {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.search-text-panel .search-text-panel-container {
+  padding: 12px;
+  width: 370px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.search-text-panel .search-text-panel-container .input-group img {
+  filter: invert(74%) sepia(8%) saturate(193%) hue-rotate(153deg) brightness(92%) contrast(86%);
+}
+.search-text-panel .search-text-panel-container .input-group .button-search:not(:disabled) {
+  background-color: var(--accent);
+}
+.search-text-panel .search-text-panel-container .search-toolbar {
+  display: flex;
+  align-items: stretch;
+  height: 20px;
+  gap: 12px;
+  font-size: 12px;
+}
+.search-text-panel .search-text-panel-container .search-toolbar .search-toolbar-section {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.search-text-panel .search-text-panel-container .search-toolbar .search-toolbar-section.navigation span {
+  color: #A4ABAE;
+  flex-grow: 1;
+}
+.search-text-panel .search-text-panel-container .search-toolbar .search-toolbar-section.navigation div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.search-text-panel .search-text-panel-container .search-toolbar .search-toolbar-section.navigation div img {
+  cursor: pointer;
+}
+.search-text-panel .search-text-panel-container .search-toolbar .search-toolbar-section.navigation div img.disabled {
+  filter: invert(74%) sepia(8%) saturate(193%) hue-rotate(153deg) brightness(92%) contrast(86%);
+}
+.search-text-panel .search-text-panel-container .search-toolbar .search-toolbar-separator {
+  height: 100%;
+  width: 1px;
+  height: 100%;
+  background-color: #EDF1F2;
+}
+.search-text-panel .search-text-panel-container img {
+  filter: brightness(0%);
+}
+.search-text-panel .search-text-panel-container img.disabled {
+  filter: invert(74%) sepia(8%) saturate(193%) hue-rotate(153deg) brightness(92%) contrast(86%);
+}
+
+svg:not(.ignore-filter) path[stroke]:not([stroke=none]), svg:not(.ignore-filter) rect[stroke]:not([stroke=none]) {
+  stroke: var(--toolbar-color);
+}
+svg:not(.ignore-filter) path[fill]:not([fill=none]), svg:not(.ignore-filter) rect[fill]:not([fill=none]) {
+  fill: var(--toolbar-color);
+}
+
+/*# sourceMappingURL=bottom-toolbar.component.css.map */

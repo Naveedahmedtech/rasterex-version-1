@@ -43,7 +43,7 @@
 
     </div>
     <rx-annotation-tools></rx-annotation-tools>
-<!--    <rx-bottom-toolbar *ngIf="numOpenFiles$ | async" [(isVisible)]="isVisible" [lists]="lists"></rx-bottom-toolbar>-->
+    <rx-bottom-toolbar *ngIf="(numOpenFiles$ | async) && sessionContext.mode === 'signature'" [(isVisible)]="isVisible" [lists]="lists"></rx-bottom-toolbar>
     <div *ngFor="let list of lists;">
       <div *ngIf="list.linkURL !== ' ' && list.linkURL !== '' && isVisible && list.type !== 20" class="link" [ngStyle]="{ 'top.px' : list.rectangle?.y, 'left.px' : list.rectangle?.x}">
         <img (click)="followLink = true; annotation = list;" src="/assets/images/link.svg" />
@@ -73,7 +73,7 @@
 <file-info />
 
 <!-- Tooltip that follows the cursor -->
-<div class="tooltip" *ngIf="tooltipService.show " [ngStyle]="{'left.px': (tooltipService.position | async)?.x, 'top.px': (tooltipService.position | async)?.y}">
+<div class="tooltip" *ngIf="sessionContext.show " [ngStyle]="{'left.px': (sessionContext.position | async)?.x, 'top.px': (sessionContext.position | async)?.y}">
   Drag where the issue is
 </div>
 
@@ -88,10 +88,10 @@
 <!--  Drag your finger to mark the area of the issue-->
 <!--</div>-->
 <!--<div class="floating-instruction"-->
-<!--     *ngIf="tooltipService.show | async"-->
+<!--     *ngIf="sessionContext.show | async"-->
 <!--     [ngStyle]="{-->
-<!--       top: (tooltipService.position | async)?.y + 'px',-->
-<!--       left: (tooltipService.position | async)?.x + 'px'-->
+<!--       top: (sessionContext.position | async)?.y + 'px',-->
+<!--       left: (sessionContext.position | async)?.x + 'px'-->
 <!--     }">-->
 <!--  Drag your finger to mark the area of the issue-->
 <!--</div>-->

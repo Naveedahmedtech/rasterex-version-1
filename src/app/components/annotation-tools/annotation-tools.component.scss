@@ -1,8 +1,6 @@
 @import "../../../assets/scss/config.scss";
 
-
-
-/* === Annotation Tools Layout === */
+/* === Annotation Tools Container === */
 .annotation-tools-container {
   position: relative;
   width: 100%;
@@ -12,30 +10,85 @@
   z-index: 1;
 }
 
-/* === Floating Create Issue Button === */
+/* === Floating Button Styles === */
 .create-issue-btn-floating {
-  position: fixed;
-  bottom: 24%;
-  right: 24px;
-  z-index: 1050;
-
-  background-color: #FFC107;
+  background-color: #ffc107;
   color: #ffffff;
   border: none;
-  border-radius: 50px;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 500;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 600;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: background-color 0.2s ease;
+  width: 100%;
+  max-width: 200px;
+  text-align: center;
 
   &:hover {
     background-color: #dba100;
   }
+
+  &.delete {
+    background-color: #2b4cd5;
+
+    &:hover {
+      background-color: #2a59b0;
+    }
+  }
 }
 
-/* === Custom Modal Overlay === */
+/* === Fixed Floating Button for Annotation or Create === */
+.button-fixed-bottom {
+  position: fixed;
+  right: 16px;
+  bottom: 20%;
+  z-index: 1050;
+
+  @media (min-width: 768px) {
+    right: 24px;
+    bottom: 24%;
+  }
+}
+
+/* === Signature Action Button Group === */
+.signature-button-group {
+  position: fixed;
+  right: 16px;
+  bottom: 30%;
+  display: flex;
+  //flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+  z-index: 1050;
+
+  //@media (min-width: 768px) {
+  //  right: 24px;
+  //  bottom: 12%;
+  //  gap: 16px;
+  //}
+  //
+  //@media (max-width: 480px) {
+  //  right: 12px;
+  //  bottom: 6%;
+  //  gap: 12px;
+  //}
+}
+
+/* === Panels Container === */
+.annotation-panels-container {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 8px;
+
+  @media (max-width: 768px) {
+    padding: 4px;
+  }
+}
+
+/* === Custom Modal Backdrop === */
 .custom-modal-backdrop {
   position: fixed;
   top: 0;
@@ -64,9 +117,14 @@
     margin-bottom: 24px;
     color: #333c4e;
   }
+
+  //@media (max-width: 480px) {
+  //  width: 90%;
+  //  padding: 24px 16px;
+  //}
 }
 
-/* === Shape Option (Ellipse) === */
+/* === Tooltip Shape Option === */
 .shape-option {
   display: flex;
   flex-direction: column;
@@ -90,7 +148,7 @@
   }
 }
 
-/* === Cancel Button === */
+/* === Cancel/Close Button === */
 .close-btn {
   margin-top: 24px;
   padding: 10px 20px;
@@ -106,13 +164,3 @@
     background-color: #5a6268;
   }
 }
-
-/* === Panels Container === */
-.annotation-panels-container {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  padding: 8px;
-}
-
-
