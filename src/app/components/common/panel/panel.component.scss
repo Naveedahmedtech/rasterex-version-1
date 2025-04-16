@@ -22,7 +22,7 @@
     flex-direction: column;
     border-radius: 8px;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
-    overflow: visible; // allow content height to grow naturally
+    overflow: visible;
     background-color: #fff;
 
     .panel-header {
@@ -58,44 +58,62 @@
       padding: 24px;
       border-bottom-left-radius: 8px;
       border-bottom-right-radius: 8px;
-      overflow: visible; // prevent scrollbars
-      height: 400px;
+      overflow: visible;
+      height: auto;
+
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: #333;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px 12px;
+        margin-bottom: 16px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background-color: #f9f9f9;
+        transition: border 0.3s ease, box-shadow 0.3s ease;
+
+        &:focus {
+          border-color: #FFC107;
+          box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.25);
+          outline: none;
+          background-color: #fff;
+        }
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 10px;
+        font-size: 14px;
+        background-color: #FFC107;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: darken(#FFC107, 10%);
+        }
+
+        &:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
+        }
+      }
     }
   }
 }
 
-/* === Responsive Behavior === */
-@media (max-width: 768px) {
-  .panel-backdrop {
-    .panel-container {
-      width: 95vw;
-    }
 
-    .panel-header {
-      font-size: 14px;
-      padding: 12px 16px;
-    }
-
-    .panel-body {
-      padding: 16px;
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .panel-backdrop {
-    .panel-container {
-      width: 98vw;
-      border-radius: 6px;
-    }
-
-    .panel-header {
-      font-size: 13px;
-      padding: 10px 14px;
-    }
-
-    .panel-body {
-      padding: 14px;
-    }
-  }
-}

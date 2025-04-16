@@ -470,7 +470,7 @@ export class PropertiesPanelComponent implements OnInit {
             fileId: this.sessionContext.projectId, // or actual file ID if you have it
           }
         }, '*');
-        this.notificationService.notification({message: 'Annotation Deleted Successfully!', type: 'success'});
+        this.notificationService.notification({message: 'Annotation Created Successfully!', type: 'success'});
       })
       .catch((error) => {
         RXCore.markUpSave(); // still save even if issue fails

@@ -47,7 +47,6 @@
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   cursor: pointer;
   transition: background-color 0.2s ease;
-  width: 100%;
   max-width: 200px;
   text-align: center;
 }
@@ -65,7 +64,7 @@
 .button-fixed-bottom {
   position: fixed;
   right: 16px;
-  bottom: 20%;
+  bottom: 25%;
   z-index: 1050;
 }
 @media (min-width: 768px) {

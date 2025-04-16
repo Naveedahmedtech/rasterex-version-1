@@ -1,3 +1,4 @@
+<notification />
 <rx-properties-panel></rx-properties-panel>
 <app-message-broker />
 <!--<app-global-tooltip></app-global-tooltip>-->
@@ -22,7 +23,6 @@
       <div *ngIf="(guiConfig$ | async).canFileOpen && !eventUploadFile" class="btn-choice-file" (click)="handleChoiceFileClick()">CHOOSE FILE</div>
       <!-- <p class="copyright">PDF Reader powered by Foxit. Copyright (c) 2003-2024 by Foxit Software Incorporated</p> -->
     </div>
-    <notification />
     <div
       id="rxcontainer"
       (pointerdown)="onMouseDown($event)"
@@ -77,8 +77,8 @@
   Drag where the issue is
 </div>
 
-
 <app-align-feature-tutorial />
+
 
 
 <!--&lt;!&ndash; 🖱️ Floating Mouse Tooltip &ndash;&gt;-->

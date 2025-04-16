@@ -80,34 +80,54 @@
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   overflow: visible;
-  height: 400px;
+  height: auto;
 }
-
-/* === Responsive Behavior === */
-@media (max-width: 768px) {
-  .panel-backdrop .panel-container {
-    width: 95vw;
-  }
-  .panel-backdrop .panel-header {
-    font-size: 14px;
-    padding: 12px 16px;
-  }
-  .panel-backdrop .panel-body {
-    padding: 16px;
-  }
+.panel-backdrop .panel-container .panel-body label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #333;
 }
-@media (max-width: 480px) {
-  .panel-backdrop .panel-container {
-    width: 98vw;
-    border-radius: 6px;
-  }
-  .panel-backdrop .panel-header {
-    font-size: 13px;
-    padding: 10px 14px;
-  }
-  .panel-backdrop .panel-body {
-    padding: 14px;
-  }
+.panel-backdrop .panel-container .panel-body input,
+.panel-backdrop .panel-container .panel-body select,
+.panel-backdrop .panel-container .panel-body textarea {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+.panel-backdrop .panel-container .panel-body input:focus,
+.panel-backdrop .panel-container .panel-body select:focus,
+.panel-backdrop .panel-container .panel-body textarea:focus {
+  border-color: #FFC107;
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.25);
+  outline: none;
+  background-color: #fff;
+}
+.panel-backdrop .panel-container .panel-body .form-group {
+  margin-bottom: 20px;
+}
+.panel-backdrop .panel-container .panel-body button {
+  padding: 10px;
+  font-size: 14px;
+  background-color: #FFC107;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.panel-backdrop .panel-container .panel-body button:hover {
+  background-color: #d39e00;
+}
+.panel-backdrop .panel-container .panel-body button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
 /*# sourceMappingURL=panel.component.css.map */

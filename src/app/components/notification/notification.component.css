@@ -1,0 +1,103 @@
+:root {
+  --accent: #31BD59;
+  --accent-secondary: #F0F7F9;
+  --main: #333C4E;
+  --secondary: #A4ABAE;
+  --light-secondary: #EDF1F2;
+  --inactive: #DBDBDB;
+  --background: #D6DADC;
+  --background-light: #F0F7F9;
+  --background-secondary: #F5F5F5;
+  --side-nav-background: #F0F7F9;
+  --side-nav-background-active: #FFFFFF;
+  --side-nav-color: #A6ADB0;
+  --side-nav-color-active: #31BD59;
+  --side-nav-panel-background: #FFFFFF;
+  --top-nav-background: #FFFFFF;
+  --top-nav-color: #333C4E;
+  --top-nav-background-active: #F0F7F9;
+  --top-nav-color-active: #333C4E;
+  --top-nav-border-bottom-color-active: transparent;
+  --toolbar-background: #FFFFFF;
+  --toolbar-color: #333C4E;
+  --toolbar-background-active: #31BD59;
+  --logo-height: auto;
+  --body-overflow: hidden;
+}
+
+.notification {
+  position: fixed;
+  top: 85px;
+  left: 53%;
+  transform: translate(-50%, -50%);
+  width: 430px;
+  height: 64px;
+  border: 1px solid;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  z-index: 10000;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s linear 1s, opacity 1s linear;
+}
+.notification .image {
+  width: 15%;
+  text-align: center;
+  margin-top: 6px;
+}
+.notification .text {
+  width: 85%;
+}
+.notification .text p {
+  margin: 6px 0;
+}
+.notification .text .title {
+  font-size: 14px;
+  font-weight: 700;
+}
+.notification .text .message {
+  color: var(--main);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.is-notification {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+.info {
+  border-color: #359EFF;
+  background: #E3EFFD;
+}
+.info .title {
+  color: #359EFF;
+}
+
+.error {
+  border-color: #FF0000;
+  background: #FDE3E3;
+}
+.error .title {
+  color: #FF0000;
+}
+
+.warning {
+  border-color: #CAA210;
+  background: #FFF1DC;
+}
+.warning .title {
+  color: #CAA210;
+}
+
+.success {
+  border-color: var(--accent);
+  background: #DDF4E4;
+}
+.success .title {
+  color: var(--accent);
+}
+
+/*# sourceMappingURL=notification.component.css.map */
