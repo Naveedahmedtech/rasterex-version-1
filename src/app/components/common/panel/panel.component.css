@@ -55,7 +55,7 @@
   gap: 8px;
   align-items: center;
   padding: 14px 20px;
-  background-color: #FFC107;
+  background-color: #052c65;
   color: #FFFFFF;
   font-size: 16px;
   font-weight: 600;
@@ -80,7 +80,7 @@
   border-bottom-left-radius: 8px;
   border-bottom-right-radius: 8px;
   overflow: visible;
-  height: auto;
+  min-height: 400px;
 }
 .panel-backdrop .panel-container .panel-body label {
   display: block;
@@ -104,8 +104,8 @@
 .panel-backdrop .panel-container .panel-body input:focus,
 .panel-backdrop .panel-container .panel-body select:focus,
 .panel-backdrop .panel-container .panel-body textarea:focus {
-  border-color: #FFC107;
-  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.25);
+  border-color: #0c397c;
+  box-shadow: 0 0 0 2px #011b40;
   outline: none;
   background-color: #fff;
 }
@@ -115,7 +115,7 @@
 .panel-backdrop .panel-container .panel-body button {
   padding: 10px;
   font-size: 14px;
-  background-color: #FFC107;
+  background-color: #052c65;
   color: #fff;
   border: none;
   border-radius: 6px;
@@ -123,7 +123,7 @@
   transition: background-color 0.3s ease;
 }
 .panel-backdrop .panel-container .panel-body button:hover {
-  background-color: #d39e00;
+  background-color: #082856;
 }
 .panel-backdrop .panel-container .panel-body button:disabled {
   background-color: #ccc;

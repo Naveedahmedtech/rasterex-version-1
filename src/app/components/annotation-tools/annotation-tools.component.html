@@ -1,7 +1,7 @@
 <!-- Annotation Tools Container -->
 <div class="annotation-tools-container" *ngIf="(opened$ | async) && sessionContext.isFileReady">
 
-  <!-- ✅ Create Issue Button -->
+  <!-- âœ… Create Issue Button -->
   <button
     *ngIf="(canAddAnnotation | async) && !(guiConfig$ | async)?.disableMarkupShapeButton && !annotationCreated && !(service.openIssueForm$ | async) && mode === 'annotation'"
     class="create-issue-btn-floating button-fixed-bottom"
@@ -10,7 +10,7 @@
     Create Issue
   </button>
 
-  <!-- ✅ Signature Buttons (Create, Save, Delete) -->
+  <!-- âœ… Signature Buttons (Create, Save, Delete) -->
   <div *ngIf="!sessionContext.isSigned && mode === 'signature' && !signaturedSaved">
 
     <button
@@ -38,7 +38,7 @@
 
   </div>
 
-  <!-- ✅ Confirm Annotation Button -->
+  <!-- âœ… Confirm Annotation Button -->
   <button *ngIf="annotationCreated && mode === 'annotation'"
           class="create-issue-btn-floating button-fixed-bottom"
           (click)="confirmAnnotation()"
@@ -46,7 +46,7 @@
     Next
   </button>
 
-  <!-- 🧩 Annotation Panels -->
+  <!-- ðŸ§© Annotation Panels -->
   <div class="annotation-panels-container">
     <rx-erase-panel></rx-erase-panel>
     <rx-count-panel *ngIf="isActionSelected['COUNT']"></rx-count-panel>
@@ -59,7 +59,7 @@
 
 </div>
 
-<!-- 🛠️ Global Tools -->
+<!-- ðŸ› ï¸ Global Tools -->
 <rx-context-editor></rx-context-editor>
 <rx-quick-actions-menu></rx-quick-actions-menu>
 <rx-note-popover></rx-note-popover>

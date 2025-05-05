@@ -361,7 +361,7 @@
 
         &:focus {
           outline: none;
-          border-color: #ff9800;
+          border-color: #052c65;
         }
       }
 
@@ -415,11 +415,11 @@
         }
 
         &:first-child {
-          background-color: #ff9800;
+          background-color: #052c65;
           color: white;
 
           &:hover:enabled {
-            background-color: #fb8c00;
+            background-color: #0d3f85;
           }
         }
 

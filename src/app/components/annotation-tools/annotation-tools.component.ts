@@ -111,7 +111,7 @@ export class AnnotationToolsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-console.log('SELLL----kjdsf===ksdjf==++', this.rxCoreService.getSelectedMarkup())
+    console.log('SELLL----kjdsf===ksdjf==++', this.rxCoreService.getSelectedMarkup())
 
     this.guiConfig$.subscribe(config => {
       this.guiConfig = config;
@@ -233,7 +233,7 @@ console.log('SELLL----kjdsf===ksdjf==++', this.rxCoreService.getSelectedMarkup()
 
     this.mode = this.sessionContext.mode!;
 
-
+    console.log({mode: this.sessionContext.mode, signed: this.sessionContext.isSigned})
     RXCore.restoreDefault();
     //this.service.hideQuickActionsMenu();
     //this.service.setNotePanelState({ visible: false });
@@ -281,10 +281,11 @@ console.log('SELLL----kjdsf===ksdjf==++', this.rxCoreService.getSelectedMarkup()
   }
 
   startSignature() {
-    this.notificationService.notification({ message: 'Draw the signature!', type: 'info'})
+    this.notificationService.notification({message: 'Draw the signature!', type: 'info'})
     this.onActionSelect('PAINT_FREEHAND')
     this.signatureCreated = true;
   }
+
   saveSignature() {
     this.savingSignature = true;
 
@@ -300,7 +301,7 @@ console.log('SELLL----kjdsf===ksdjf==++', this.rxCoreService.getSelectedMarkup()
         type: 'success'
       });
 
-      // ✅ Send postMessage to parent (React)
+      // âœ… Send postMessage to parent (React)
       window.parent.postMessage({
         type: 'SIGNATURE_SAVE',
         payload: {
@@ -320,6 +321,7 @@ console.log('SELLL----kjdsf===ksdjf==++', this.rxCoreService.getSelectedMarkup()
   }
 
   guids: string[];
+
   deleteSignature() {
     RXCore.markUpFreePen(false)
     RXCore.lockMarkup(true)
@@ -329,6 +331,7 @@ console.log('SELLL----kjdsf===ksdjf==++', this.rxCoreService.getSelectedMarkup()
     }
     this.startSignature()
   }
+
   saveSignatureToServer() {
     // Return issueId
     return new Promise((resolve, reject) => {
@@ -341,7 +344,7 @@ console.log('SELLL----kjdsf===ksdjf==++', this.rxCoreService.getSelectedMarkup()
         .subscribe({
           next: (response) => {
             console.log('Issue created successfully:', response?.data?.id);
-            resolve(response?.data); // ✅ Return the issueId
+            resolve(response?.data); // âœ… Return the issueId
           },
           error: (error) => {
             console.error('Error creating issue:', error);
@@ -350,6 +353,7 @@ console.log('SELLL----kjdsf===ksdjf==++', this.rxCoreService.getSelectedMarkup()
         });
     });
   }
+
   updateTooltipPosition(event: MouseEvent): void {
     // Update tooltip position as the mouse moves.
     this.tooltipX = event.clientX;
@@ -611,10 +615,10 @@ console.log('SELLL----kjdsf===ksdjf==++', this.rxCoreService.getSelectedMarkup()
 
   confirmAnnotation() {
     // if (this.annotation && this.annotation.type) {
-      this.annotationCreated = false;
-      this.service.setOpenIssueForm(true)
-      this.service.setPropertiesPanelState({visible: true, readonly: false});
-      RXCore.lockMarkup(true)
+    this.annotationCreated = false;
+    this.service.setOpenIssueForm(true)
+    this.service.setPropertiesPanelState({visible: true, readonly: false});
+    RXCore.lockMarkup(true)
     // }
   }
 

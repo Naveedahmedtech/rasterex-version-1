@@ -103,7 +103,7 @@
 .properties-panel-container .form-section .field input:focus,
 .properties-panel-container .form-section .field textarea:focus {
   outline: none;
-  border-color: #ff9800;
+  border-color: #052c65;
 }
 .properties-panel-container .form-section .field textarea {
   resize: vertical;
@@ -148,11 +148,11 @@
   cursor: not-allowed;
 }
 .properties-panel-container .form-section .btn-group button:first-child {
-  background-color: #ff9800;
+  background-color: #052c65;
   color: white;
 }
 .properties-panel-container .form-section .btn-group button:first-child:hover:enabled {
-  background-color: #fb8c00;
+  background-color: #0d3f85;
 }
 .properties-panel-container .form-section .btn-group button:last-child {
   background-color: #e0e0e0;

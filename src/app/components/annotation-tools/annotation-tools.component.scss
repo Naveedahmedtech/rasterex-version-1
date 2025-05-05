@@ -12,7 +12,7 @@
 
 /* === Floating Button Styles === */
 .create-issue-btn-floating {
-  background-color: #ffc107;
+  background-color: #052c65;
   color: #ffffff;
   border: none;
   border-radius: 999px;
@@ -26,7 +26,7 @@
   text-align: center;
 
   &:hover {
-    background-color: #dba100;
+    background-color: #1654a6;
   }
 
   &.delete {
@@ -42,13 +42,9 @@
 .button-fixed-bottom {
   position: fixed;
   right: 16px;
-  bottom: 25%;
+  bottom: 50% !important;
   z-index: 1050;
 
-  @media (min-width: 768px) {
-    right: 24px;
-    bottom: 24%;
-  }
 }
 
 /* === Signature Action Button Group === */

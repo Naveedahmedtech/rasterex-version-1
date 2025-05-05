@@ -37,7 +37,7 @@
 
 /* === Floating Button Styles === */
 .create-issue-btn-floating {
-  background-color: #ffc107;
+  background-color: #052c65;
   color: #ffffff;
   border: none;
   border-radius: 999px;
@@ -51,7 +51,7 @@
   text-align: center;
 }
 .create-issue-btn-floating:hover {
-  background-color: #dba100;
+  background-color: #1654a6;
 }
 .create-issue-btn-floating.delete {
   background-color: #2b4cd5;
@@ -64,14 +64,8 @@
 .button-fixed-bottom {
   position: fixed;
   right: 16px;
-  bottom: 25%;
+  bottom: 50% !important;
   z-index: 1050;
-}
-@media (min-width: 768px) {
-  .button-fixed-bottom {
-    right: 24px;
-    bottom: 24%;
-  }
 }
 
 /* === Signature Action Button Group === */

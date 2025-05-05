@@ -417,7 +417,7 @@ export class PropertiesPanelComponent implements OnInit {
 
     if (!markup || markup === -1) {
       this.errorMessage = 'Markup is not ready.';
-      console.warn("⚠️ markup is not ready");
+      console.warn("âš ï¸ markup is not ready");
       this.isLoading = false;
       return;
     }
@@ -444,7 +444,7 @@ export class PropertiesPanelComponent implements OnInit {
       image: this.base64Image || null
     })
       .then((response: any) => {
-        // ✅ Add issueId to markup attributes
+        // âœ… Add issueId to markup attributes
         markupObj.customattributes.push({name: 'issueId', value: response.id});
         if (response.file) {
           markupObj.customattributes.push({name: 'filePath', value: response.file.filePath});
@@ -459,7 +459,7 @@ export class PropertiesPanelComponent implements OnInit {
         this.visible = false;
         this.annotationToolsService.setOpenIssueForm(false);
         this.showForm = false;
-        // ✅ Send postMessage to parent (React)
+        // âœ… Send postMessage to parent (React)
         window.parent.postMessage({
           type: 'ISSUE_SAVE',
           payload: {
@@ -470,12 +470,12 @@ export class PropertiesPanelComponent implements OnInit {
             fileId: this.sessionContext.projectId, // or actual file ID if you have it
           }
         }, '*');
-        this.notificationService.notification({message: 'Annotation Created Successfully!', type: 'success'});
+        this.notificationService.notification({message: 'Issue Created Successfully!', type: 'success'});
       })
       .catch((error) => {
         RXCore.markUpSave(); // still save even if issue fails
-        this.errorMessage = '❌ Issue creation failed. Please try again.';
-        console.error('❌ Issue creation failed:', error);
+        this.errorMessage = 'âŒ Issue creation failed. Please try again.';
+        console.error('âŒ Issue creation failed:', error);
       })
       .finally(() => {
         this.isLoading = false;
@@ -518,7 +518,7 @@ export class PropertiesPanelComponent implements OnInit {
   //       console.log('Saved custom attributes:', markupObj.customattributes);
   //       RXCore.markUpSave();
   //       this.successMessage = 'Issue Saved successfully!';
-  //       console.error('❌ Issue creation failed:', error);
+  //       console.error('âŒ Issue creation failed:', error);
   //     }).finally(() => {
   //     this.isLoading = false;
   //   });
@@ -601,7 +601,7 @@ export class PropertiesPanelComponent implements OnInit {
         .subscribe({
           next: (response) => {
             console.log('Issue created successfully:', response?.data?.id);
-            resolve(response?.data); // ✅ Return the issueId
+            resolve(response?.data); // âœ… Return the issueId
           },
           error: (error) => {
             console.error('Error creating issue:', error);
@@ -716,7 +716,7 @@ export class PropertiesPanelComponent implements OnInit {
       if (response) {
         RXCore.deleteMarkUp()
         RXCore.markUpSave()
-        // ✅ Send postMessage to parent (React)
+        // âœ… Send postMessage to parent (React)
         window.parent.postMessage({
           type: 'ISSUE_SAVE',
           payload: {
@@ -730,7 +730,7 @@ export class PropertiesPanelComponent implements OnInit {
       }
     });
     this.visible = false;
-    this.notificationService.notification({message: 'Annotation Deleted Successfully!', type: 'success'});
+    this.notificationService.notification({message: 'Issue Deleted Successfully!', type: 'success'});
   }
 
   deleteIssue() {
