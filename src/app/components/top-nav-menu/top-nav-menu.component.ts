@@ -66,7 +66,7 @@ export class TopNavMenuComponent implements OnInit {
     private readonly service: TopNavMenuService,
     private readonly sideNavMenuService: SideNavMenuService,
     private readonly measurePanelService: MeasurePanelService
-    ) {
+  ) {
   }
 
 
@@ -113,7 +113,7 @@ export class TopNavMenuComponent implements OnInit {
           this.rxCoreService.setGuiMode(GuiMode.Annotate);
           this.onModeChange(annotateOption, false);
 
-          // ✅ Force the annotation panel/tools to refresh
+          // âœ… Force the annotation panel/tools to refresh
           this.annotationToolsService.show();
           this.annotationToolsService.setSelectedOption(annotateOption);
         }
@@ -162,7 +162,7 @@ export class TopNavMenuComponent implements OnInit {
 
     this.annotationToolsService.notePanelState$.subscribe(state => {
       if(state?.markupnumber !== undefined)
-      this.isActionSelected = state?.markupnumber;
+        this.isActionSelected = state?.markupnumber;
     });
 
     this.measurePanelService.measureScaleState$.subscribe((state) => {

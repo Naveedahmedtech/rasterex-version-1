@@ -5,7 +5,7 @@ import { Subject, BehaviorSubject, Observable } from "rxjs";
   providedIn: 'root'
 })
 export class AnnotationToolsService {
-  
+
 
   constructor() { }
 
@@ -104,6 +104,14 @@ export class AnnotationToolsService {
   public selectedOption$: Observable<any> = this._selectedOption.asObservable();
   public setSelectedOption(any): void {
     this._selectedOption.next(any);
+  }
+
+
+  private _openIssueForm: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public openIssueForm$: Observable<boolean> = this._openIssueForm.asObservable();
+
+  public setOpenIssueForm(value: boolean): void {
+    this._openIssueForm.next(value);
   }
 
 }

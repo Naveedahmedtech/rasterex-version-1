@@ -1,4 +1,7 @@
+<notification />
+<rx-properties-panel></rx-properties-panel>
 <app-message-broker />
+<!--<app-global-tooltip></app-global-tooltip>-->
 
 <top-nav-menu style="z-index: 3; position: fixed; top: 0; left: 0; width: 100%;" [class.hidden]="(guiConfig$ | async).disableTopNavMenu" [state]="state" [ngStyle]="{'filter': eventUploadFile ? 'blur(3px)' : 'none' }"></top-nav-menu>
 <side-nav-menu style="z-index: 2; position: fixed; top: 49px; left: 0; height: calc(100% - 49px);" *ngIf="!(guiConfig$ | async).disableSideNavMenu"></side-nav-menu>
@@ -20,7 +23,6 @@
       <div *ngIf="(guiConfig$ | async).canFileOpen && !eventUploadFile" class="btn-choice-file" (click)="handleChoiceFileClick()">CHOOSE FILE</div>
       <!-- <p class="copyright">PDF Reader powered by Foxit. Copyright (c) 2003-2024 by Foxit Software Incorporated</p> -->
     </div>
-    <notification />
     <div
       id="rxcontainer"
       (pointerdown)="onMouseDown($event)"
@@ -41,7 +43,7 @@
 
     </div>
     <rx-annotation-tools></rx-annotation-tools>
-<!--    <rx-bottom-toolbar *ngIf="numOpenFiles$ | async" [(isVisible)]="isVisible" [lists]="lists"></rx-bottom-toolbar>-->
+    <rx-bottom-toolbar *ngIf="(numOpenFiles$ | async) && sessionContext.mode === 'signature'" [(isVisible)]="isVisible" [lists]="lists"></rx-bottom-toolbar>
     <div *ngFor="let list of lists;">
       <div *ngIf="list.linkURL !== ' ' && list.linkURL !== '' && isVisible && list.type !== 20" class="link" [ngStyle]="{ 'top.px' : list.rectangle?.y, 'left.px' : list.rectangle?.x}">
         <img (click)="followLink = true; annotation = list;" src="/assets/images/link.svg" />
@@ -70,4 +72,26 @@
 
 <file-info />
 
+<!-- Tooltip that follows the cursor -->
+<div class="tooltip" *ngIf="sessionContext.show " [ngStyle]="{'left.px': (sessionContext.position | async)?.x, 'top.px': (sessionContext.position | async)?.y}">
+  Drag where the issue is
+</div>
+
 <app-align-feature-tutorial />
+
+
+
+<!--&lt;!&ndash; 🖱️ Floating Mouse Tooltip &ndash;&gt;-->
+<!--<div class="floating-instruction"-->
+<!--     *ngIf="showMouseTooltip"-->
+<!--     [ngStyle]="{ top: mouseY + 'px', left: mouseX + 'px' }">-->
+<!--  Drag your finger to mark the area of the issue-->
+<!--</div>-->
+<!--<div class="floating-instruction"-->
+<!--     *ngIf="sessionContext.show | async"-->
+<!--     [ngStyle]="{-->
+<!--       top: (sessionContext.position | async)?.y + 'px',-->
+<!--       left: (sessionContext.position | async)?.x + 'px'-->
+<!--     }">-->
+<!--  Drag your finger to mark the area of the issue-->
+<!--</div>-->

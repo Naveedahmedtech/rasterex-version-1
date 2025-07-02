@@ -14,7 +14,7 @@
     z-index: 10000;
     visibility: hidden;
     opacity: 0;
-    transition: visibility 0s linear 0.33s, opacity 0.33s linear; 
+    transition: visibility 0s linear 1s, opacity 1s linear;
 
     .image {
         width: 15%;
