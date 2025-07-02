@@ -1,6 +1,5 @@
 <rx-panel *ngIf="visible" title="Issue Details" (onClose)="onClose()">
   <div class="properties-panel-container">
-
     <!-- Info Section: visible only when the form is collapsed -->
     <div *ngIf="!showForm" class="block-section">
       <div class="info-container">
@@ -37,10 +36,17 @@
         </ng-container>
       </div>
 
-
       <!-- Delete Button -->
-      <div class="btn-group" style="justify-content: flex-start; margin-top: 12px;" *ngIf="formTitle">
-        <button class="delete-button" (click)="onDelete()" aria-label="Delete Issue">
+      <div
+        class="btn-group"
+        style="justify-content: flex-start; margin-top: 12px"
+        *ngIf="formTitle"
+      >
+        <button
+          class="delete-button"
+          (click)="onDelete()"
+          aria-label="Delete Issue"
+        >
           Delete
         </button>
       </div>
@@ -58,7 +64,14 @@
             [(ngModel)]="formTitle"
             placeholder="Enter title"
             aria-required="true"
+            maxlength="100"
           />
+          <div
+            class="char-count"
+            [ngClass]="{ 'limit-reached': formTitle?.length >= 100 }"
+          >
+            {{ formTitle?.length || 0 }}/100
+          </div>
         </section>
 
         <!-- Description Field -->
@@ -68,7 +81,9 @@
             id="formDescription"
             [(ngModel)]="formDescription"
             placeholder="Enter description"
+            maxlength="500"
           ></textarea>
+          <div class="char-count"  [ngClass]="{'limit-reached': formDescription?.length >= 500}">{{ formDescription?.length || 0 }}/500</div>
         </section>
 
         <!-- Capture Image from Camera -->
@@ -84,7 +99,9 @@
         </section>
 
         <!-- Messages -->
-        <div *ngIf="successMessage" class="alert success">{{ successMessage }}</div>
+        <div *ngIf="successMessage" class="alert success">
+          {{ successMessage }}
+        </div>
         <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
         <div *ngIf="isLoading" class="loading-spinner">Saving...</div>
 
@@ -93,12 +110,9 @@
           <button (click)="onSave()" [disabled]="isLoading || !formTitle">
             Save
           </button>
-          <button (click)="onCancel()" [disabled]="isLoading">
-            Cancel
-          </button>
+          <button (click)="onCancel()" [disabled]="isLoading">Clear</button>
         </div>
       </div>
     </div>
-
   </div>
 </rx-panel>

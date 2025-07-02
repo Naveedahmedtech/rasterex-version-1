@@ -748,21 +748,21 @@ export class AppComponent implements AfterViewInit {
 
   onKeydown(event): void {
 
-    if (event.key == "z") {
-      event.preventDefault();
-      RXCore.pageLock(true);
-      console.log(event.key, "kay pressed");
-    }
+    // if (event.key == "z") {
+    //   event.preventDefault();
+    //   RXCore.pageLock(true);
+    //   console.log(event.key, "kay pressed");
+    // }
 
   }
 
   onKeyup(event): void {
 
-    if (event.key == "z") {
-      event.preventDefault();
-      RXCore.pageLock(false);
-      console.log(event.key, "kay released");
-    }
+    // if (event.key == "z") {
+    //   event.preventDefault();
+    //   RXCore.pageLock(false);
+    //   console.log(event.key, "kay released");
+    // }
 
   }
 
