@@ -80741,7 +80741,7 @@ function PointFromArcDist(x, y, xc, yc, radius, sang, sweep){
 
         XMLGetFile += "</RxViewServer>";
 
-
+	console.log("Get Fiel logs", XMLGetFile)
 
         var callbacklist = [
             {event : "callback", func : callback},
@@ -88354,6 +88354,7 @@ function PointFromArcDist(x, y, xc, yc, radius, sang, sweep){
     }
 
     const sendHttpRequestXML = function(method, url, data, callbacklist){
+console.log("Params",{url, data})
         const xhrpromise = new Promise(function(resolve,reject){
             const xhr = new XMLHttpRequest();
 
@@ -88461,7 +88462,7 @@ function PointFromArcDist(x, y, xc, yc, radius, sang, sweep){
                     }
                 }
             }, false);
-
+console.log("sendData RXFUnctions", data)
             xhr.send(data);
 
         });

@@ -4,7 +4,7 @@ var RxConfig = (function() {
     /* server connect */
     var gui360URL = "rxweb/";
 
-    var baseURL = "https://test.rasterex.com/";
+    var baseURL = "https://server.viewsoft.io/";
     var apiBaseURL = "https://rxserver.rasterex.com/";
 
     var baseURLBin = baseURL + "RxBinWeb/";
@@ -35,8 +35,8 @@ var RxConfig = (function() {
 
 
     var CanvasSaveUrl = baseURLBin + "RxCSISAPI.dll?WebClientSaveImageAs";
-    var UploadServerfolder = "E:\\Rasterex\\Upload\\";
-    var UploadServerfolderd = "E:\\\\Rasterex\\\\Upload\\\\";
+    var UploadServerfolder = "C:\\Rasterex\\Upload\\";
+    var UploadServerfolderd = "C:\\\\Rasterex\\\\Upload\\\\";
     var xmlurlrel = baseURLBinWeb;
     var xmlurlrelmarkup = baseURLBinWeb;
     var uploadfolderURL = baseURLWeb + "Upload/";
@@ -45,7 +45,7 @@ var RxConfig = (function() {
     var noteImgSrc = baseURL + "rxweb/images/note.png";
     var PDFcmap = baseURLWeb + "pdfjs/web/cmaps/";
 
-    var baseFileURL = "E:\\\\Rasterex\\\\Upload\\\\";
+    var baseFileURL = "C:\\\\Rasterex\\\\Upload\\\\";
 
     var PDFLib = baseURLWeb + "pdfjs/build/pdf.js";
     var PDFWorker = baseURLWeb + "pdfjs/build/pdf.worker.js";

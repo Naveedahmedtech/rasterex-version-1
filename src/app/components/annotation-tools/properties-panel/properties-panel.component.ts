@@ -263,6 +263,37 @@ export class PropertiesPanelComponent implements OnInit {
   annotation: any;
   issueId: string;
 
+  private isInvalidFileUrl(url?: string | null): boolean {
+    if (!url) return true;
+    const s = String(url).trim();
+    if (!s) return true;
+    // Guard common junk
+    const badTokens = ['undefined', 'null', 'NaN'];
+    if (badTokens.some((t) => s.includes(t))) return true;
+    return false;
+  }
+
+  get fileUrl(): string | null {
+    try {
+      const guid = this.markup?.uniqueID;
+      if (!guid) return null;
+
+      const attrs = (RXCore as any).getmarkupobjByGUID(guid)?.GetAttributes?.();
+      const filePath = attrs?.find((a: any) => a.name === 'filePath')?.value as
+        | string
+        | undefined;
+
+      if (!filePath) return null;
+
+      const url = `${NEST_URL}/${filePath}`;
+      return this.isInvalidFileUrl(url) ? null : url;
+    } catch {
+      return null;
+    }
+  }
+
+  // (optional) stricter image check used by the template
+
   ngOnInit(): void {
     console.log('show form? ', this.showForm);
 
@@ -352,6 +383,16 @@ export class PropertiesPanelComponent implements OnInit {
 
       this._setVisibility();
       //this._setTitle();
+      const filePathAttr = (RXCore as any)
+        .getmarkupobjByGUID(markup.uniqueID)
+        ?.GetAttributes()
+        ?.find((att) => att.name === 'filePath')?.value;
+      console.log(
+        'HELLO',
+        (RXCore as any).getmarkupobjByGUID(markup.uniqueID)?.GetAttributes(),
+        'kjdf',
+        filePathAttr
+      );
 
       this.title = this.markup.getMarkupType().label;
 
@@ -393,8 +434,15 @@ export class PropertiesPanelComponent implements OnInit {
           .getmarkupobjByGUID(markup.uniqueID)
           ?.GetAttributes()
           ?.find((att) => att.name === 'title')?.value || '';
+      // this.infoData = {
+      //   // RXCore.getDisplayName(markup.signature) ||
+      //   'Author:': this.sessionContext.username,
+      //   'Time:': (markup as any).GetDateTime(true),
+
+      // };
+
       this.infoData = {
-        // RXCore.getDisplayName(markup.signature) ||
+        ...this.infoData, // keep existing file if new emission lacks it
         'Author:': this.sessionContext.username,
         'Time:': (markup as any).GetDateTime(true),
         title: (RXCore as any)
@@ -405,14 +453,12 @@ export class PropertiesPanelComponent implements OnInit {
           .getmarkupobjByGUID(markup.uniqueID)
           ?.GetAttributes()
           ?.find((att) => att.name === 'description')?.value,
-        file:
-          NEST_URL +
-          '/' +
-          (RXCore as any)
-            .getmarkupobjByGUID(markup.uniqueID)
-            ?.GetAttributes()
-            ?.find((att) => att.name === 'filePath')?.value,
+        ...(filePathAttr ? { file: `${NEST_URL}/${filePathAttr}` } : {}),
       };
+      // and then, only add/replace file when present:
+      if (filePathAttr) {
+        (this.infoData as any).file = `${NEST_URL}/${filePathAttr}`;
+      }
 
       if (markup.type == MARKUP_TYPES.COUNT.type) {
         console.log('markup is selected!');
@@ -453,7 +499,10 @@ export class PropertiesPanelComponent implements OnInit {
       }
     });
   }
-
+  isValidImageUrl(url: string): boolean {
+    if (this.isInvalidFileUrl(url)) return false;
+    return /\.(png|jpe?g|gif|webp|bmp|svg)(\?|#|$)/i.test(url);
+  }
   onSave() {
     this.isLoading = true;
     this.successMessage = '';
@@ -557,11 +606,11 @@ export class PropertiesPanelComponent implements OnInit {
       });
   }
 
-  isValidImageUrl(url: string): boolean {
-    return Boolean(
-      url && !url.endsWith('/undefined') && !url.includes('undefined')
-    );
-  }
+  // isValidImageUrl(url: string): boolean {
+  //   return Boolean(
+  //     url && !url.endsWith('/undefined') && !url.includes('undefined')
+  //   );
+  // }
 
   // onSave() {
   //   this.isLoading = true;

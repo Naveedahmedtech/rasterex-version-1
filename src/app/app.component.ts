@@ -232,6 +232,8 @@ export class AppComponent implements AfterViewInit {
 
       this.openInitFile(initialDoc);
 
+      // RXCore.setinitFile("https://static.packt-cdn.com/downloads/9781838645649_ColorImages.pdf")
+
 
       /*if(this.bguireadycalled){
         return;
@@ -708,7 +710,6 @@ export class AppComponent implements AfterViewInit {
 
 
   openInitFile(initialDoc) {
-
     if (this.bguireadycalled && this.bfoxitreadycalled) {
 
       if (initialDoc.open && !this.binitfileopened) {

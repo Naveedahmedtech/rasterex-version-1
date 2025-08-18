@@ -1,61 +1,89 @@
 <rx-panel *ngIf="visible" title="Issue Details" (onClose)="onClose()">
   <div class="properties-panel-container">
-    <!-- Info Section: visible only when the form is collapsed -->
+    <!-- ======================= INFO (READ-ONLY) ======================= -->
     <div *ngIf="!showForm" class="block-section">
-      <div class="info-container">
-        <ng-container *ngFor="let item of infoData | keyvalue">
-          <div class="row-header">{{ item.key }}</div>
+      <div
+        class="details-card"
+        role="region"
+        aria-labelledby="issue-details-heading"
+      >
+        <h3 id="issue-details-heading" class="section-title">Issue Details</h3>
 
-          <!-- Textual values -->
-          <div *ngIf="item.key !== 'file'" class="info-value">
-            {{ item.value }}
+        <dl class="details-grid">
+          <!-- Title -->
+          <div class="detail-row">
+            <dt class="label">Title</dt>
+            <dd class="value">{{ infoData["title"] || "—" }}</dd>
           </div>
 
-          <!-- File/Image Preview -->
-          <div *ngIf="item.key === 'file'">
-            <ng-container *ngIf="isValidImageUrl(item.value); else fallback">
-              <a [href]="item.value" target="_blank">
-                <img
-                  [src]="item.value"
-                  alt="Attached Issue File"
-                  (error)="imageError = true"
-                  *ngIf="!imageError"
-                  class="preview-image"
-                />
-              </a>
-            </ng-container>
-
-            <!-- Fallback display -->
-            <ng-template #fallback>
-              <div class="image-error">
-                <!--                No Image.-->
-                <!--                <a *ngIf="item.value" [href]="item.value" target="_blank" rel="noopener">Open File</a>-->
-              </div>
-            </ng-template>
+          <!-- Description -->
+          <div class="detail-row">
+            <dt class="label">Description</dt>
+            <dd class="value prewrap">{{ infoData["description"] || "—" }}</dd>
           </div>
-        </ng-container>
+
+          <!-- File (image preview if possible, else link, else dash) -->
+          <!-- File -->
+          <div class="detail-row">
+            <dt class="label">File</dt>
+            <dd class="value">
+              <ng-container *ngIf="fileUrl as f; else noFile">
+                <ng-container
+                  *ngIf="isValidImageUrl(f) && !imageError; else fileLink"
+                >
+                  <a [href]="f" target="_blank" rel="noopener">
+                    <img
+                      [src]="f"
+                      alt="Attached file preview"
+                      class="preview-image"
+                      (error)="imageError = true"
+                    />
+                  </a>
+                </ng-container>
+                <ng-template #fileLink>
+                  <a [href]="f" target="_blank" rel="noopener" class="file-link"
+                    >Open file</a
+                  >
+                </ng-template>
+              </ng-container>
+              <ng-template #noFile>—</ng-template>
+            </dd>
+          </div>
+
+          <!-- Author -->
+          <div class="detail-row">
+            <dt class="label">Author</dt>
+            <dd class="value">
+              {{ infoData["Author:"] || sessionContext?.username || "—" }}
+            </dd>
+          </div>
+
+          <!-- Time -->
+          <div class="detail-row">
+            <dt class="label">Time</dt>
+            <dd class="value">{{ infoData["Time:"] || "—" }}</dd>
+          </div>
+        </dl>
       </div>
 
-      <!-- Delete Button -->
-      <div
-        class="btn-group"
-        style="justify-content: flex-start; margin-top: 12px"
-        *ngIf="formTitle"
-      >
-        <button
-          class="delete-button"
-          (click)="onDelete()"
-          aria-label="Delete Issue"
-        >
-          Delete
-        </button>
+      <!-- Actions (read-only) -->
+      <div class="actions-row" *ngIf="formTitle">
+        <div class="btn-group">
+          <button
+            class="btn btn-danger"
+            (click)="onDelete()"
+            aria-label="Delete Issue"
+          >
+            Delete
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Form Block -->
+    <!-- ======================= FORM (EDIT/CREATE) ======================= -->
     <div class="block-section" *ngIf="showForm">
       <div class="form-section">
-        <!-- Title Field -->
+        <!-- Title -->
         <section class="field">
           <label for="formTitle">Title <span class="required">*</span></label>
           <input
@@ -74,7 +102,7 @@
           </div>
         </section>
 
-        <!-- Description Field -->
+        <!-- Description -->
         <section class="field">
           <label for="formDescription">Description</label>
           <textarea
@@ -83,10 +111,15 @@
             placeholder="Enter description"
             maxlength="500"
           ></textarea>
-          <div class="char-count"  [ngClass]="{'limit-reached': formDescription?.length >= 500}">{{ formDescription?.length || 0 }}/500</div>
+          <div
+            class="char-count"
+            [ngClass]="{ 'limit-reached': formDescription?.length >= 500 }"
+          >
+            {{ formDescription?.length || 0 }}/500
+          </div>
         </section>
 
-        <!-- Capture Image from Camera -->
+        <!-- Attach Image -->
         <section class="field">
           <label for="issue-image">Attach Image (Take Photo)</label>
           <input
@@ -96,21 +129,37 @@
             accept="image/*"
             capture="environment"
           />
+          <div class="preview-inline" *ngIf="imagePreview">
+            <img
+              [src]="imagePreview"
+              alt="Selected image preview"
+              class="preview-image small"
+            />
+          </div>
         </section>
 
         <!-- Messages -->
-        <div *ngIf="successMessage" class="alert success">
+        <div *ngIf="successMessage" class="alert success" role="status">
           {{ successMessage }}
         </div>
-        <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
-        <div *ngIf="isLoading" class="loading-spinner">Saving...</div>
+        <div *ngIf="errorMessage" class="alert error" role="alert">
+          {{ errorMessage }}
+        </div>
+        <div *ngIf="isLoading" class="loading-spinner" aria-live="polite">
+          Saving...
+        </div>
 
-        <!-- Action Buttons -->
-        <div class="btn-group">
-          <button (click)="onSave()" [disabled]="isLoading || !formTitle">
-            Save
-          </button>
-          <button (click)="onCancel()" [disabled]="isLoading">Clear</button>
+        <!-- Actions (form) -->
+        <div class="actions-row">
+          <div class="btn-group">
+            <button
+              class="btn btn-primary"
+              (click)="onSave()"
+              [disabled]="isLoading || !formTitle"
+            >
+              Save
+            </button>
+          </div>
         </div>
       </div>
     </div>
