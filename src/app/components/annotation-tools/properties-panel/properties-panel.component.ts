@@ -64,6 +64,8 @@ export class PropertiesPanelComponent implements OnInit {
   base64Image: string | null = null;
   imageError: boolean = false;
 
+  markupNumber: string;
+
   constructor(
     private readonly rxCoreService: RxCoreService,
     private readonly annotationToolsService: AnnotationToolsService,
@@ -377,6 +379,10 @@ export class PropertiesPanelComponent implements OnInit {
         { attributes: markup.GetAttributes() }
       );
 
+      console.log('markup number', markup.uniqueID);
+
+      this.markupNumber = markup.uniqueID;
+
       this.currentType = markup.type;
       this.locked = markup.locked;
       //|| markup.type == MARKUP_TYPES.MEASURE.AREA.type && markup.subtype == MARKUP_TYPES.MEASURE.AREA.subType
@@ -598,8 +604,8 @@ export class PropertiesPanelComponent implements OnInit {
       })
       .catch((error) => {
         RXCore.markUpSave(); // still save even if issue fails
-        this.errorMessage = 'âŒ Issue creation failed. Please try again.';
-        console.error('âŒ Issue creation failed:', error);
+        this.errorMessage = 'Issue creation failed. Please try again.';
+        console.error('Issue creation failed:', error);
       })
       .finally(() => {
         this.isLoading = false;
@@ -729,10 +735,10 @@ export class PropertiesPanelComponent implements OnInit {
     });
   }
 
-  onCancel() {
-    this.formTitle = '';
-    this.formDescription = '';
-  }
+  // onCancel() {
+  //   this.formTitle = '';
+  //   this.formDescription = '';
+  // }
 
   onTextChange(event): void {
     this.text = event.target.value;
@@ -820,7 +826,44 @@ export class PropertiesPanelComponent implements OnInit {
 
   onClose(): void {
     this.visible = false;
+    this.annotationToolsService.setOpenIssueForm(false);
     RXCore.selectMarkUp(false);
+  }
+
+  onCancel(): void {
+    const { markup, operation } = this.latestGuiMarkup || {};
+
+    if (!markup || markup === -1) {
+      this.errorMessage = 'Markup is not ready.';
+      console.warn('âš ï¸ markup is not ready');
+      this.isLoading = false;
+      return;
+    }
+
+    this.markup = markup;
+    const markupObj = (RXCore as any).getmarkupobjByGUID(markup.uniqueID);
+    const attributes = markupObj?.GetAttributes();
+
+    console.log(
+      'Selected Markup:*** ',
+      this.markupNumber,
+      markup.uniqueID,
+      markupObj,
+      attributes
+    );
+    // RXCore.selectMarkupbyGUID
+    this.visible = false;
+    this.rxCoreService.guiMarkup$.subscribe(({ markup, operation }) => {
+      console.log('operation?.created', operation?.created);
+      if (operation?.created) {
+        RXCore.selectMarkUp(true);
+      }
+    });
+    RXCore.deleteMarkupbyGUID(markup.uniqueID);
+    RXCore.markUpSave();
+    this.annotationToolsService.setOpenIssueForm(false);
+    RXCore.selectMarkUp(false);
+    this.showForm = false;
   }
 
   onDelete() {

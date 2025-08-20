@@ -22,7 +22,6 @@
             <dd class="value prewrap">{{ infoData["description"] || "—" }}</dd>
           </div>
 
-          <!-- File (image preview if possible, else link, else dash) -->
           <!-- File -->
           <div class="detail-row">
             <dt class="label">File</dt>
@@ -40,10 +39,11 @@
                     />
                   </a>
                 </ng-container>
-                <ng-template #fileLink>
-                  <a [href]="f" target="_blank" rel="noopener" class="file-link"
-                    >Open file</a
-                  >
+                <ng-template #fileLink> 
+                  -
+                  <!-- <a [href]="f" target="_blank" rel="noopener" class="file-link">
+                    Open file
+                  </a> -->
                 </ng-template>
               </ng-container>
               <ng-template #noFile>—</ng-template>
@@ -75,6 +75,13 @@
             aria-label="Delete Issue"
           >
             Delete
+          </button>
+          <button
+            class="btn btn-secondary"
+            (click)="onClose()"
+            aria-label="Close Panel"
+          >
+            Close
           </button>
         </div>
       </div>
@@ -158,6 +165,13 @@
               [disabled]="isLoading || !formTitle"
             >
               Save
+            </button>
+            <button
+              class="btn btn-danger"
+              (click)="onCancel()"
+              [disabled]="isLoading"
+            >
+              Cancel
             </button>
           </div>
         </div>

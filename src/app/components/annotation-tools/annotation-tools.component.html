@@ -16,7 +16,7 @@
     <button
       *ngIf="(canAddAnnotation | async) && !(guiConfig$ | async)?.disableMarkupShapeButton && !annotationCreated && !(service.openIssueForm$ | async) && !signatureCreated"
       class="create-issue-btn-floating button-fixed-bottom"
-      (click)="startSignature()"
+      (click)="openSignatureModal()"
     >
       Create Signature
     </button>
@@ -65,3 +65,24 @@
 <rx-note-popover></rx-note-popover>
 <rx-note-popover [mode]="'tooltip'"></rx-note-popover>
 <rx-measure-detail-panel *ngIf="!(guiConfig$ | async).disableMarkupMeasureButton"></rx-measure-detail-panel>
+
+<rx-signature-modal *ngIf="(service.signatureModalOpen$ | async)"></rx-signature-modal>
+
+
+
+
+<!-- ghost follows mouse while placing -->
+<!-- <div
+  class="signature-ghost"
+  *ngIf="(service.placingSignature$ | async) as sig"
+  [ngStyle]="{ left: ghostX+'px', top: ghostY+'px' }"
+  (click)="dropSignature(sig)"
+>
+  <svg [attr.width]="sig.bbox.w" [attr.height]="sig.bbox.h"
+       viewBox="0 0 {{sig.bbox.w}} {{sig.bbox.h}}">
+    <path [attr.d]="sig.svgPath"
+          [attr.stroke]="sig.style.color"
+          fill="none"
+          [attr.stroke-width]="sig.style.stroke"/>
+  </svg>
+</div> -->

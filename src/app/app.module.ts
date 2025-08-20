@@ -99,6 +99,7 @@ import { CommentStatusIconComponent } from './components/annotation-tools/commen
 import { LoginComponent } from './components/user/login/login.component';
 import { RoomPanelComponent } from './components/collab/room-panel.component';
 import {GlobalTooltipComponent} from "./global-tooltip.component";
+import { SignatureModalComponent } from './components/annotation-tools/signature-modal/signature-modal.component';
 
 const storeSchema = [
   { name: 'name', keypath: 'name', options: { unique: false } },
@@ -164,6 +165,7 @@ const dbConfig: DBConfig  = {
     StampPanelComponent,
     StampTemplateDirective,
     //InteractiveStampTemplateDirective,
+    SignatureModalComponent,
     MeasurePanelComponent,
     SignatureComponent,
     CheckboxComponent,

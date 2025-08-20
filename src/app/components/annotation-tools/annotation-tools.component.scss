@@ -159,3 +159,11 @@
     background-color: #5a6268;
   }
 }
+
+
+.signature-ghost {
+  position: fixed;
+  pointer-events: none; /* follows mouse */
+  z-index: 2000;
+  opacity: 0.8;
+}

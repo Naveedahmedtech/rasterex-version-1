@@ -1,6 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Subject, BehaviorSubject, Observable } from "rxjs";
 
+
+export type DrawnSignature = {
+  kind: 'drawn';
+  svgPath: string;                      // path 'M ... L ...'
+  bbox: { w: number; h: number };       // natural size (px) of the drawing
+  style: { color: string; stroke: number };
+};
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,6 +26,36 @@ export class AnnotationToolsService {
   public hide(): void {
     this._opened.next(false);
   }
+
+  
+  /** ================= SIGNATURE MODAL ================= */
+  private _signatureModalOpen = new BehaviorSubject<boolean>(false);
+  public signatureModalOpen$: Observable<boolean> = this._signatureModalOpen.asObservable();
+
+  public openSignatureModal(): void {
+    this._signatureModalOpen.next(true);
+  }
+
+  public closeSignatureModal(): void {
+    this._signatureModalOpen.next(false);
+  }
+
+    /** Emits when user taps "Done" in the modal with the drawn signature */
+  public signatureCreated$ = new Subject<DrawnSignature>();
+
+
+
+  // 
+  private _placingSignature = new BehaviorSubject<DrawnSignature | null>(null);
+public placingSignature$ = this._placingSignature.asObservable();
+
+beginPlacement(sig: DrawnSignature) {
+  this._placingSignature.next(sig);
+}
+endPlacement() {
+  this._placingSignature.next(null);
+}
+
 
   private _quickActionsMenuVisible: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public quickActionsMenuVisible$: Observable<boolean> = this._quickActionsMenuVisible.asObservable();

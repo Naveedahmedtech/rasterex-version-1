@@ -4,7 +4,7 @@ import {
   OnInit,
   ViewEncapsulation,
 } from '@angular/core';
-import { AnnotationToolsService } from './annotation-tools.service';
+import { AnnotationToolsService, DrawnSignature } from './annotation-tools.service';
 import { RXCore } from 'src/rxcore';
 import { RxCoreService } from 'src/app/services/rxcore.service';
 import { MARKUP_TYPES } from 'src/rxcore/constants';
@@ -36,6 +36,9 @@ export class AnnotationToolsComponent implements OnInit {
   operation: any;
   annotation: any;
   snap: any;
+
+    ghostX = 0;
+  ghostY = 0;
 
   isActionSelected = {
     TEXT: false,
@@ -166,7 +169,12 @@ export class AnnotationToolsComponent implements OnInit {
     });
 
     this.rxCoreService.guiMarkup$.subscribe(({ markup, operation }) => {
-      console.log('Operation created!', { markup, operation });
+    if (markup && markup !== -1 && typeof (markup as any).getUniqueID === 'function') {
+  console.log('Operation created!', (markup as any).getUniqueID());
+} else {
+  console.warn('Operation failed or markup invalid:', markup);
+}
+
       if (markup !== -1) {
         if (markup.type == MARKUP_TYPES.COUNT.type) return;
         if (markup.type == MARKUP_TYPES.STAMP.type) {
@@ -183,7 +191,13 @@ export class AnnotationToolsComponent implements OnInit {
         //console.log("reset to default tool here");
         if (operation?.created) {
           this.annotationCreated = true;
+          console.log("Markup selected", RXCore.getSelectedMarkup())
+
           this._deselectAllActions();
+          if(this.mode === 'annotation') {
+            // RXCore.markUpSave();
+            this.confirmAnnotation();
+          }
         }
         //this._deselectAllActions();
 
@@ -267,6 +281,21 @@ export class AnnotationToolsComponent implements OnInit {
   savingSignature: boolean = false;
   signaturedSaved: boolean = false;
 
+
+    @HostListener('document:mousemove', ['$event'])
+  onMove(ev: MouseEvent) {
+    // if (this.service.isPlacing?.() || false) {
+    //   this.ghostX = ev.clientX + 10;
+    //   this.ghostY = ev.clientY + 10;
+    // }
+  }
+
+  dropSignature(sig: DrawnSignature) {
+    // TODO: place on PDF page (for now just log)
+    console.log('Dropped signature:', sig, 'at', this.ghostX, this.ghostY);
+    this.service.endPlacement();
+  }
+
   startEllipseIssue(event?: MouseEvent) {
     if (event) {
       (event.target as HTMLElement)?.blur();
@@ -310,6 +339,10 @@ export class AnnotationToolsComponent implements OnInit {
     this.signatureCreated = true;
   }
 
+  openSignatureModal() {
+    this.service.openSignatureModal()
+  }
+
   saveSignature() {
     this.savingSignature = true;
 
@@ -346,7 +379,6 @@ export class AnnotationToolsComponent implements OnInit {
         );
 
         window.parent.postMessage(payload, REACT_URL);
-
       })
       .catch((error) => {
         console.log(error);
