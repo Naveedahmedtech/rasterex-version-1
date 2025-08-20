@@ -1,11 +1,10 @@
-<div class="panel-backdrop">
-  <div class="panel-container">
-    <div class="panel-header">
-      <span class="title">{{ title }}</span>
-      <!-- <span class="btn-close" (click)="onCloseClick()">&times;</span> -->
+<div
+    class="panel-container">
+    <div #panelHeader class="panel-header">
+        <span class="title">{{title}}</span>
+        <span class="btn-close" (click)="onCloseClick()">&times;</span>
     </div>
     <div class="panel-body" [ngStyle]="{'max-height.px': maxHeight, 'overflow-y': 'auto'}">
-      <ng-content></ng-content>
+        <ng-content></ng-content>
     </div>
-  </div>
 </div>

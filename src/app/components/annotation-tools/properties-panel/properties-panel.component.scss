@@ -47,11 +47,9 @@
 /* ===== Details card ===== */
 
 .details-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  // border: 1px solid var(--border);
+  // border-radius: 12px;
   padding: 16px;
-  box-shadow: var(--shadow-sm);
 }
 
 .section-title {
@@ -104,11 +102,7 @@
 /* ===== Form card ===== */
 
 .form-section {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: var(--shadow-sm);
+  padding: 10px;
 }
 
 .field {
@@ -163,6 +157,7 @@ select:focus {
 .actions-row {
   margin-top: 14px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-start; /* change to flex-end if you prefer right aligned */
 }
 
@@ -170,7 +165,7 @@ select:focus {
 .btn-group {
   display: flex;
   gap: 10px;
-  // flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 /* Danger: make sure there IS a border */
 .btn-danger {

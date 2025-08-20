@@ -1,33 +1,11 @@
-<div class="backdrop" (click)="cancel()"></div>
-
-<div class="dialog" #padWrap>
-  <header class="toolbar">
-    <div class="left">
-      <button type="button" class="btn ghost" (click)="cancel()">Cancel</button>
+<div class="panel-backdrop">
+  <div class="panel-container">
+    <div class="panel-header">
+      <span class="title">{{ title }}</span>
+      <!-- <span class="btn-close" (click)="onCloseClick()">&times;</span> -->
     </div>
-    <div class="center">
-      <label class="color">
-        <input type="color" [(ngModel)]="color" aria-label="Ink color">
-      </label>
-      <input class="range" type="range" min="1" max="8" step="1" [(ngModel)]="stroke" aria-label="Stroke width">
-
-      <!-- Use getter instead of private fields -->
-      <button type="button" class="btn" (click)="undo()"  [disabled]="!hasAnyStrokes">Undo</button>
-      <button type="button" class="btn" (click)="clear()" [disabled]="!hasAnyStrokes">Clear</button>
+    <div class="panel-body" [ngStyle]="{'max-height.px': maxHeight, 'overflow-y': 'auto'}">
+      <ng-content></ng-content>
     </div>
-    <div class="right">
-      <button type="button" class="btn primary" (click)="done()">Done</button>
-    </div>
-  </header>
-
-  <div class="pad">
-    <canvas #pad
-      class="canvas"
-      (pointerdown)="onDown($event)"
-      (pointermove)="onMove($event)"
-      (pointerup)="onUp($event)"
-      (pointercancel)="onUp($event)">
-    </canvas>
-    <div class="hint">Sign with your finger, mouse, or pen</div>
   </div>
 </div>

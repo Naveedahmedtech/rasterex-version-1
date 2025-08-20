@@ -1,3 +1,7 @@
+
+
+
+
 /* rasterex ui global styles */
 #rxcontainer {
     position: relative;
@@ -10,6 +14,55 @@
     overflow: hidden;
     z-index: 0;
 }
+
+.signature-overlay {
+  position: absolute; inset: 0; z-index: 5;
+  pointer-events: none;  /* the container ignores events... */
+}
+.signature-overlay .sig-instance {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: auto; /* ...but each instance is interactive */
+  border: 1px dashed transparent;
+}
+.signature-overlay .sig-instance.dragging,
+.signature-overlay .sig-instance.resizing {
+  border-color: #0f62fe;
+}
+.sig-instance .resize-handle {
+  position: absolute; width: 12px; height: 12px; border-radius: 50%;
+  background: #0f62fe; bottom: -8px; right: -8px; cursor: nwse-resize;
+}
+#rxcontainer > .overlay-layer {
+  position: absolute; inset: 0; z-index: 9999;
+  pointer-events: none; /* super important */
+}
+
+/* Signature items themselves re-enable pointer events */
+#rxcontainer > .overlay-layer .sig-instance { pointer-events: auto; }
+
+
+
+.signature-overlay {
+  position: absolute;
+  cursor: move;
+  img {
+    max-width: 200px; // scalable
+    height: auto;
+    pointer-events: none; // so drag works on container, not image
+  }
+}
+
+.drag-shield {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9998;
+  background: transparent;
+}
+
 
 #canv3D {
     

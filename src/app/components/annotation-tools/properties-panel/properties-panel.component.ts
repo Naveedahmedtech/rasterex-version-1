@@ -840,6 +840,8 @@ export class PropertiesPanelComponent implements OnInit {
       return;
     }
 
+    this.imagePreview = null;
+
     this.markup = markup;
     const markupObj = (RXCore as any).getmarkupobjByGUID(markup.uniqueID);
     const attributes = markupObj?.GetAttributes();
@@ -874,8 +876,7 @@ export class PropertiesPanelComponent implements OnInit {
     });
     this.deleteIssue().then((response) => {
       if (response) {
-        RXCore.deleteMarkUp();
-        RXCore.markUpSave();
+
 
         const payload = {
           type: 'ISSUE_SAVE',
@@ -906,23 +907,30 @@ export class PropertiesPanelComponent implements OnInit {
     });
   }
 
-  deleteIssue() {
-    return new Promise((resolve, reject) => {
-      const headers = new HttpHeaders();
-      this.http
-        .delete(`${NEST_URL}/api/v1/issue/${this.issueId}`, { headers })
-        .subscribe({
-          next: (response) => {
-            console.log('Issue deleted successfully:', response);
-            resolve(true);
-          },
-          error: (error) => {
-            console.error('Error creating issue:', error);
-            reject(error);
-          },
-        });
-    });
-  }
+deleteIssue() {
+  return new Promise((resolve, reject) => {
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+    this.http
+      .request('delete', `${NEST_URL}/api/v1/issue/${this.issueId}`, {
+        headers,
+        body: { userId: this.sessionContext.userId },   
+      })
+      .subscribe({
+        next: (response) => {
+          RXCore.deleteMarkUp();
+          RXCore.markUpSave();
+          console.log('Issue deleted successfully:', response);
+          resolve(true);
+        },
+        error: (error) => {
+          console.error('Error deleting issue:', error);
+          reject(error);
+        },
+      });
+  });
+}
+
 
   onFileSelected(event: any) {
     const file = event.target.files[0];

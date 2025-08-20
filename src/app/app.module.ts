@@ -100,6 +100,7 @@ import { LoginComponent } from './components/user/login/login.component';
 import { RoomPanelComponent } from './components/collab/room-panel.component';
 import {GlobalTooltipComponent} from "./global-tooltip.component";
 import { SignatureModalComponent } from './components/annotation-tools/signature-modal/signature-modal.component';
+import { SignatureItemComponent } from './components/annotation-tools/signature-modal/signature-item/signature-item.component';
 
 const storeSchema = [
   { name: 'name', keypath: 'name', options: { unique: false } },
@@ -142,6 +143,7 @@ const dbConfig: DBConfig  = {
     LineStyleSelectComponent,
     SelectComponent,
     PanelComponent,
+    SignatureItemComponent,
     SwitchComponent,
     VectorLayersComponent,
     ConfirmationModalComponent,

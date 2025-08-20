@@ -1,72 +1,119 @@
-:host { position: fixed; inset: 0; z-index: 1000; }
+@import "../../../../assets/scss/config.scss";
 
-.backdrop {
-  position: absolute; inset: 0;
-  background: rgba(0,0,0,0.4);
+.panel-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  backdrop-filter: blur(6px);
+  background-color: rgba(0, 0, 0, 0.25);
+  z-index: 999;
+
+  .panel-container {
+    width: 90vw;
+    max-width: 960px;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    border-radius: 8px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
+    overflow: visible;
+    background-color: #fff;
+
+    .panel-header {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 14px 20px;
+      background-color: #052c65;
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 600;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+
+      .title {
+        flex-grow: 1;
+      }
+
+      .btn-close {
+        font-size: 24px;
+        font-weight: normal;
+        cursor: pointer;
+        line-height: 1;
+        transition: color 0.2s ease;
+
+        &:hover {
+          color: #333;
+        }
+      }
+    }
+
+    .panel-body {
+      padding: 24px;
+      border-bottom-left-radius: 8px;
+      border-bottom-right-radius: 8px;
+      overflow: visible;
+      min-height: 400px;
+
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 6px;
+        color: #333;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px 12px;
+        margin-bottom: 16px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background-color: #f9f9f9;
+        transition: border 0.3s ease, box-shadow 0.3s ease;
+
+        &:focus {
+          border-color: #0c397c;
+          box-shadow: 0 0 0 2px #011b40;
+          outline: none;
+          background-color: #fff;
+        }
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      button {
+        padding: 10px;
+        font-size: 14px;
+        background-color: #052c65;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: darken(#0c3d85, 10%);
+        }
+
+        &:disabled {
+          background-color: #ccc;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
 }
 
-.dialog {
-  position: absolute;
-  left: 50%; top: 50%;
-  transform: translate(-50%, -50%);
-  width: min(92vw, 720px);
-  height: min(70vh, 520px);
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  display: flex; flex-direction: column;
-}
 
-.toolbar {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 12px;
-  border-bottom: 1px solid #eee;
-
-  .left { justify-self: start; }
-  .center { display: flex; gap: 8px; align-items: center; justify-content: center; }
-  .right { justify-self: end; }
-}
-
-.pad {
-  position: relative;
-  flex: 1;
-  padding: 12px;
-  display: flex; flex-direction: column;
-}
-
-.canvas {
-  border: 1px dashed #ddd;
-  border-radius: 8px;
-  width: 100%; height: 100%;
-  touch-action: none;  /* IMPORTANT for mobile drawing */
-  background: #fff;
-}
-
-.hint {
-  position: absolute;
-  bottom: 18px; left: 24px;
-  font-size: 12px; color: #999;
-}
-
-.btn {
-  min-width: 64px;
-  height: 40px;
-  padding: 0 12px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  background: #f8f8f8;
-  cursor: pointer;
-  font: inherit;
-  &:disabled { opacity: 0.5; cursor: default; }
-  &.ghost { background: transparent; border-color: transparent; }
-  &.primary { background: #0b57d0; color: #fff; border-color: #0b57d0; }
-}
-
-.color input {
-  width: 40px; height: 40px; padding: 0; border: none; background: none;
-}
-
-.range { width: 140px; }

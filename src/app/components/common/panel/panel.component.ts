@@ -13,4 +13,5 @@ export class PanelComponent {
   onCloseClick(): void {
     this.onClose.emit();
   }
+
 }

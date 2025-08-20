@@ -1,172 +1,286 @@
-@import "../../../../assets/scss/config.scss";
+// ===============================
+// Colors (Material-inspired palette)
+// ===============================
+$dark-main: #0D2938;
+$surface: #ffffff;
+$surface-alt: #f8f9fb;
+$accent: #007bff;
+$accent-hover: darken($accent, 6%);
+$text-dark: #1b1b1b;
+$text-muted: #6c757d;
+$border-color: #e2e6ea;
+$danger: #dc3545;
+$shadow: rgba(0,0,0,0.08);
 
+// ===============================
+// Container
+// ===============================
 .stamp-panel-container {
-  box-sizing: border-box;
-  scrollbar-width: thin;
-  max-height: 500px;
-
-  section {
-    width: 285px;
-    h4 {
-      margin: 12px 0;
-      color: #a4abae;
-      font-size: 12px;
-      font-style: normal;
-      font-weight: 700;
-      line-height: 16px;
-    }
-  }
-
-  .templates-list {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-y: scroll;
-    height: 465px;
-    div {
-      margin-top: 5px;
-      padding: 3px 0;
-      border: 1px solid #eee;
-      border-radius: 4px;
-    }
-  }
-
-  .add-custom-stamp {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    margin: 5px 0;
-    font-size: 12px;
-    color: $main;
-
-    img {
-      cursor: pointer;
-    }
-  }
-}
-
-#body {
-  width: 364px;
-  box-sizing: border-box;
-}
-
-#stampText {
-  width: 100%;
-  margin: 5px;
-}
-
-#stampText input {
-  width: 90%;
-}
-
-#close {
-  right: 14px;
-  top: 10px;
-}
-
-#confirmModal {
-  max-width: fit-content;
-}
-
-#preview {
-  height: 150px;
-  background-color: #f0f0f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 8px;
-  min-width: 360px;
-}
-
-#custom-checkbox-container {
-  display: flex;
-  margin: 5px !important;
-}
-
-#custom-checkbox-container label {
-  display: flex;
-  align-items: center;
-  margin-right: 5px;
-  font-size: 12px;
-}
-
-#custom-checkbox-container input {
-  width: auto !important;
-  margin: 5px !important;
-  padding: 6px;
-}
-
-.form-container {
-  background-color: #c0c0c0;
-  padding: 10px;
-  border: 2px solid black;
-  border-radius: 5px;
-  width: 400px;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.company-logo {
-  margin-right: 20px;
-}
-
-.company-logo img {
-  max-width: 100px;
-  max-height: 100px;
-  margin-top: 10px;
-}
-
-.company-name {
-  flex-grow: 1;
-}
-
-.status {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.status div {
-  flex: 1;
-  display: flex;
-  align-items: center;
-}
-
-.details {
+  background: $surface;
+  color: $text-dark;
+  padding: 1.25rem;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  margin-bottom: 10px;
+  gap: 1.5rem;
+
+  section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
 }
 
-.details .row {
+// ===============================
+// Toolbar
+// ===============================
+.signature-toolbar {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem 1.25rem;
+  background: $surface-alt;
+  border: 1px solid $border-color;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px $shadow;
+
+  .toolbar-left,
+  .toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+  }
+
+  // Label + control
+  .ctrl {
+    display: flex;
+    flex-direction: column;
+    font-size: .85rem;
+    color: $text-muted;
+
+    span {
+      margin-bottom: .35rem;
+      font-weight: 500;
+      font-size: .8rem;
+    }
+
+    input[type="color"] {
+      border: 1px solid $border-color;
+      width: 2.2rem;
+      height: 2.2rem;
+      border-radius: 6px;
+      cursor: pointer;
+      background: transparent;
+      padding: 0;
+
+      &:hover {
+        border-color: $accent;
+      }
+    }
+  }
+
+  // Thickness chips
+  .thickness-group {
+    display: flex;
+    gap: .65rem;
+
+    .chip {
+      background: $surface;
+      color: $text-dark;
+      border: 1px solid $border-color;
+      border-radius: 999px;
+      padding: .4rem 1rem;
+      font-size: .85rem;
+      cursor: pointer;
+      transition: all .2s ease;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      box-shadow: 0 1px 2px $shadow;
+
+      &:hover {
+        background: $surface-alt;
+      }
+
+      &.active {
+        background: $accent;
+        color: #fff;
+        border-color: $accent;
+        box-shadow: 0 2px 6px rgba($accent, .3);
+      }
+    }
+  }
+
+  // Buttons
+  .btn {
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    font-size: .85rem;
+    padding: .55rem 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    cursor: pointer;
+    transition: all .2s ease;
+    font-weight: 500;
+    box-shadow: 0 1px 3px $shadow;
+
+    &.ghost {
+      background: $surface;
+      color: $text-dark;
+
+      &:hover:not(:disabled) {
+        background: $surface-alt;
+      }
+    }
+
+    &.primary {
+      background: $accent;
+      color: white;
+      border-color: $accent;
+
+      &:hover:not(:disabled) {
+        background: $accent-hover;
+      }
+    }
+
+    &:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
+    .icon {
+      width: 1rem;
+      height: 1rem;
+      fill: currentColor;
+    }
+  }
 }
 
-.details .row div {
-  flex: 1;
-  margin-right: 10px;
-}
-
-.details .row div:last-child {
-  margin-right: 0;
-}
-
-.footer {
+// ===============================
+// Signature Canvas
+// ===============================
+.sig-wrap {
+  background: $surface-alt;
+  border: 2px dashed $border-color;
+  border-radius: 12px;
+  padding: 1rem;
   display: flex;
-  justify-content: flex-end;
-  margin-top: 20px;
-}
-/*#tabs{
-}*/
-.file-upload {
-  margin-bottom: 20px;
+  justify-content: center;
+  align-items: center;
+  transition: border-color .3s ease, background .3s ease;
+
+  &:hover {
+    border-color: $accent;
+    background: lighten($surface-alt, 2%);
+  }
+
+  canvas {
+    width: 100%;
+    height: 240px;
+    max-height: 360px;
+    background: $surface;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    cursor: crosshair;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+  }
 }
 
-//.add-custom-stamp {
-  // Your styling here
-//}
+// ===============================
+// Templates
+// ===============================
+.templates-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: .75rem;
+
+  &.empty {
+    justify-content: center;
+    text-align: center;
+    color: $text-muted;
+    padding: 2rem 1rem;
+
+    .title {
+      font-weight: 600;
+      margin-bottom: .35rem;
+      font-size: 1rem;
+    }
+
+    .hint {
+      font-size: .85rem;
+    }
+  }
+
+  .stamp-item {
+    position: relative;
+    background: $surface;
+    border: 1px solid $border-color;
+    border-radius: 10px;
+    padding: .65rem;
+    transition: transform .15s ease, box-shadow .15s ease;
+    box-shadow: 0 1px 3px $shadow;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    img {
+      display: block;
+      border-radius: 6px;
+      background: #fff;
+      padding: .35rem;
+      max-width: 140px;
+      max-height: 90px;
+      object-fit: contain;
+    }
+
+    .icon-btn {
+      position: absolute;
+      top: .35rem;
+      right: .35rem;
+      background: $danger;
+      border: none;
+      border-radius: 50%;
+      width: 1.8rem;
+      height: 1.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba($danger, 0.25);
+      opacity: 0;
+      transition: opacity .2s ease, background .2s ease;
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+        fill: white;
+      }
+
+      &:hover {
+        background: darken($danger, 8%);
+      }
+    }
+
+    &:hover .icon-btn {
+      opacity: 1;
+    }
+  }
+}
+
+// ===============================
+// Accessibility
+// ===============================
+.btn:focus-visible,
+.chip:focus-visible,
+input[type="color"]:focus-visible {
+  outline: 2px solid $accent;
+  outline-offset: 3px;
+  border-radius: 6px;
+}

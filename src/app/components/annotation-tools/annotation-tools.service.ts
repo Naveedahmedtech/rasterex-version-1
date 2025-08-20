@@ -55,6 +55,9 @@ beginPlacement(sig: DrawnSignature) {
 endPlacement() {
   this._placingSignature.next(null);
 }
+public isPlacing(): boolean {
+  return this._placingSignature.value !== null;
+}
 
 
   private _quickActionsMenuVisible: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);

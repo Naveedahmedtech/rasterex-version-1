@@ -23,6 +23,7 @@
       <div *ngIf="(guiConfig$ | async).canFileOpen && !eventUploadFile" class="btn-choice-file" (click)="handleChoiceFileClick()">CHOOSE FILE</div>
       <!-- <p class="copyright">PDF Reader powered by Foxit. Copyright (c) 2003-2024 by Foxit Software Incorporated</p> -->
     </div>
+
     <div
       id="rxcontainer"
       (pointerdown)="onMouseDown($event)"
@@ -32,6 +33,24 @@
       (window:keydown)="onKeydown($event)"
       (window:keyup)="onKeyup($event)">
         <iframe id="foxitframe" src="/assets/html/foxpage.html"></iframe>
+<!-- overlay signature -->
+
+
+
+<!-- signature overlay -->
+<!-- <div *ngIf="signatureImage"
+     class="signature-overlay"
+     [style.top.px]="signaturePosition.y"
+     [style.left.px]="signaturePosition.x"
+     cdkDrag
+     cdkDragBoundary="#rxcontainer">
+  <img [src]="signatureImage" alt="Signature" />
+</div> -->
+
+
+
+
+
         <div id="lineConnector" class="lineconnector-container">&nbsp;</div>
 
         <div *ngIf="isUploadFile" class="progress-container">
@@ -42,7 +61,7 @@
       </div>
 
     </div>
-    <rx-annotation-tools></rx-annotation-tools>
+    <rx-annotation-tools (signatureSaved)="handleSignature($event)"></rx-annotation-tools>
     <rx-bottom-toolbar *ngIf="(numOpenFiles$ | async) && sessionContext.mode === 'signature'" [(isVisible)]="isVisible" [lists]="lists"></rx-bottom-toolbar>
     <div *ngFor="let list of lists;">
       <div *ngIf="list.linkURL !== ' ' && list.linkURL !== '' && isVisible && list.type !== 20" class="link" [ngStyle]="{ 'top.px' : list.rectangle?.y, 'left.px' : list.rectangle?.x}">
@@ -79,19 +98,4 @@
 
 <app-align-feature-tutorial />
 
-
-
-<!--&lt;!&ndash; 🖱️ Floating Mouse Tooltip &ndash;&gt;-->
-<!--<div class="floating-instruction"-->
-<!--     *ngIf="showMouseTooltip"-->
-<!--     [ngStyle]="{ top: mouseY + 'px', left: mouseX + 'px' }">-->
-<!--  Drag your finger to mark the area of the issue-->
-<!--</div>-->
-<!--<div class="floating-instruction"-->
-<!--     *ngIf="sessionContext.show | async"-->
-<!--     [ngStyle]="{-->
-<!--       top: (sessionContext.position | async)?.y + 'px',-->
-<!--       left: (sessionContext.position | async)?.x + 'px'-->
-<!--     }">-->
-<!--  Drag your finger to mark the area of the issue-->
-<!--</div>-->
+ 

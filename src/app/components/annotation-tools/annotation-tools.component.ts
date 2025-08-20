@@ -1,10 +1,15 @@
 import {
   Component,
+  EventEmitter,
   HostListener,
   OnInit,
+  Output,
   ViewEncapsulation,
 } from '@angular/core';
-import { AnnotationToolsService, DrawnSignature } from './annotation-tools.service';
+import {
+  AnnotationToolsService,
+  DrawnSignature,
+} from './annotation-tools.service';
 import { RXCore } from 'src/rxcore';
 import { RxCoreService } from 'src/app/services/rxcore.service';
 import { MARKUP_TYPES } from 'src/rxcore/constants';
@@ -16,6 +21,7 @@ import { NotificationService } from '../notification/notification.service';
 import { GuiMode } from '../../../rxcore/enums/GuiMode';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { NEST_URL, REACT_URL } from '../../constants';
+import { SignatureModalService } from 'src/app/services/signature-modal.service';
 
 @Component({
   selector: 'rx-annotation-tools',
@@ -24,6 +30,8 @@ import { NEST_URL, REACT_URL } from '../../constants';
   encapsulation: ViewEncapsulation.None,
 })
 export class AnnotationToolsComponent implements OnInit {
+  @Output() signatureSaved = new EventEmitter<string>();
+
   guiConfig$ = this.rxCoreService.guiConfig$;
   opened$ = this.service.opened$;
   guiConfig: IGuiConfig | undefined;
@@ -33,11 +41,14 @@ export class AnnotationToolsComponent implements OnInit {
   mode: string;
   signatureCreated: boolean = false;
 
+  signatureImage: string | null = null;
+  signaturePosition = { x: 100, y: 100 }; // default placement
+
   operation: any;
   annotation: any;
   snap: any;
 
-    ghostX = 0;
+  ghostX = 0;
   ghostY = 0;
 
   isActionSelected = {
@@ -120,7 +131,8 @@ export class AnnotationToolsComponent implements OnInit {
     private readonly userService: UserService,
     public sessionContext: SessionContextService,
     private readonly notificationService: NotificationService,
-    private http: HttpClient
+    private http: HttpClient,
+    public signatureModal: SignatureModalService
   ) {}
 
   ngOnInit(): void {
@@ -169,11 +181,18 @@ export class AnnotationToolsComponent implements OnInit {
     });
 
     this.rxCoreService.guiMarkup$.subscribe(({ markup, operation }) => {
-    if (markup && markup !== -1 && typeof (markup as any).getUniqueID === 'function') {
-  console.log('Operation created!', (markup as any).getUniqueID());
-} else {
-  console.warn('Operation failed or markup invalid:', markup);
-}
+      if (
+        markup &&
+        markup !== -1 &&
+        typeof (markup as any).getUniqueID === 'function'
+      ) {
+        if (this.mode === 'signature') {
+          this.signatureCreated = true;
+        }
+        console.log('Operation created!', (markup as any).getUniqueID());
+      } else {
+        console.warn('Operation failed or markup invalid:', markup);
+      }
 
       if (markup !== -1) {
         if (markup.type == MARKUP_TYPES.COUNT.type) return;
@@ -191,10 +210,10 @@ export class AnnotationToolsComponent implements OnInit {
         //console.log("reset to default tool here");
         if (operation?.created) {
           this.annotationCreated = true;
-          console.log("Markup selected", RXCore.getSelectedMarkup())
+          console.log('Markup selected', RXCore.getSelectedMarkup());
 
           this._deselectAllActions();
-          if(this.mode === 'annotation') {
+          if (this.mode === 'annotation') {
             // RXCore.markUpSave();
             this.confirmAnnotation();
           }
@@ -281,20 +300,8 @@ export class AnnotationToolsComponent implements OnInit {
   savingSignature: boolean = false;
   signaturedSaved: boolean = false;
 
-
-    @HostListener('document:mousemove', ['$event'])
-  onMove(ev: MouseEvent) {
-    // if (this.service.isPlacing?.() || false) {
-    //   this.ghostX = ev.clientX + 10;
-    //   this.ghostY = ev.clientY + 10;
-    // }
-  }
-
-  dropSignature(sig: DrawnSignature) {
-    // TODO: place on PDF page (for now just log)
-    console.log('Dropped signature:', sig, 'at', this.ghostX, this.ghostY);
-    this.service.endPlacement();
-  }
+  signaturePlaced = false;
+  placingMode = false;
 
   startEllipseIssue(event?: MouseEvent) {
     if (event) {
@@ -340,7 +347,70 @@ export class AnnotationToolsComponent implements OnInit {
   }
 
   openSignatureModal() {
-    this.service.openSignatureModal()
+    this.signatureModal.open();
+  }
+
+  handleSignature(svg: string) {
+    console.log('Got signature SVG:', svg);
+
+    // Example: keep it for later use
+    // this.signatureSvg = svg;
+  }
+
+  // (Optional) Allow dragging signature around
+  dragging = false;
+  offset = { x: 0, y: 0 };
+
+  startDrag(event: MouseEvent) {
+    this.dragging = true;
+    this.offset = {
+      x: event.clientX - this.signaturePosition.x,
+      y: event.clientY - this.signaturePosition.y,
+    };
+
+    document.addEventListener('mousemove', this.onDrag);
+    document.addEventListener('mouseup', this.stopDrag);
+  }
+
+  onDrag = (event: MouseEvent) => {
+    if (!this.dragging) return;
+    this.signaturePosition = {
+      x: event.clientX - this.offset.x,
+      y: event.clientY - this.offset.y,
+    };
+  };
+
+  stopDrag = () => {
+    this.dragging = false;
+    document.removeEventListener('mousemove', this.onDrag);
+    document.removeEventListener('mouseup', this.stopDrag);
+  };
+
+  onSignatureSaved(signature: string) {
+    this.signatureSaved.emit(signature); // bubble up to parent (AppComponent)
+  }
+
+  // Step 1: user saved signature → enable placement mode
+  prepareSignaturePlacement(signatureDataUrl: string) {
+    this.signatureImage = signatureDataUrl;
+    this.placingMode = true; // waiting for user click on PDF
+    this.signaturePlaced = false;
+  }
+
+  // Step 2: user clicks on PDF to place it
+  placeSignature(event: MouseEvent) {
+    if (!this.placingMode) return;
+
+    const pdfContainer = (
+      event.currentTarget as HTMLElement
+    ).getBoundingClientRect();
+    this.signaturePosition = {
+      x: event.clientX - pdfContainer.left,
+      y: event.clientY - pdfContainer.top,
+    };
+
+    this.signaturePlaced = true;
+    this.placingMode = false; // exit placement mode
   }
 
   saveSignature() {
