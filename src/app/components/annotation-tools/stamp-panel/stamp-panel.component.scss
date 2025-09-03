@@ -1,286 +1,474 @@
-// ===============================
-// Colors (Material-inspired palette)
-// ===============================
-$dark-main: #0D2938;
-$surface: #ffffff;
-$surface-alt: #f8f9fb;
-$accent: #007bff;
-$accent-hover: darken($accent, 6%);
-$text-dark: #1b1b1b;
-$text-muted: #6c757d;
-$border-color: #e2e6ea;
-$danger: #dc3545;
-$shadow: rgba(0,0,0,0.08);
-
-// ===============================
-// Container
-// ===============================
 .stamp-panel-container {
-  background: $surface;
-  color: $text-dark;
-  padding: 1.25rem;
-  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  padding: 1.25rem;
+  height: 100%;
+  background: #fdfdfd;
 
   section {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
+    height: 100%;
   }
 }
 
-// ===============================
-// Toolbar
-// ===============================
-.signature-toolbar {
+/* =============================
+   Signer Info (Name + Email)
+   ============================= */
+.signer-info {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
   padding: 1rem 1.25rem;
-  background: $surface-alt;
-  border: 1px solid $border-color;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px $shadow;
-
-  .toolbar-left,
-  .toolbar-right {
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    flex-wrap: wrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  .error {
+    color: #e53935;
+    font-size: 12px;
+    margin-top: 4px;
   }
 
-  // Label + control
   .ctrl {
+    flex: 1 1 250px;
     display: flex;
     flex-direction: column;
-    font-size: .85rem;
-    color: $text-muted;
+    gap: 0.35rem;
+    font-size: 0.9rem;
+    color: #374151;
+    font-weight: 500;
+
+    .error {
+      color: #e53935;
+      font-size: 12px;
+      margin-top: 4px;
+    }
 
     span {
-      margin-bottom: .35rem;
-      font-weight: 500;
-      font-size: .8rem;
-    }
-
-    input[type="color"] {
-      border: 1px solid $border-color;
-      width: 2.2rem;
-      height: 2.2rem;
-      border-radius: 6px;
-      cursor: pointer;
-      background: transparent;
-      padding: 0;
-
-      &:hover {
-        border-color: $accent;
-      }
-    }
-  }
-
-  // Thickness chips
-  .thickness-group {
-    display: flex;
-    gap: .65rem;
-
-    .chip {
-      background: $surface;
-      color: $text-dark;
-      border: 1px solid $border-color;
-      border-radius: 999px;
-      padding: .4rem 1rem;
-      font-size: .85rem;
-      cursor: pointer;
-      transition: all .2s ease;
       display: flex;
       align-items: center;
-      gap: .5rem;
-      box-shadow: 0 1px 2px $shadow;
+      gap: 0.4rem;
+      font-weight: 600;
+      color: #111827;
 
-      &:hover {
-        background: $surface-alt;
+      .material-icons {
+        font-size: 1.1rem;
+        color: #6b7280;
+      }
+    }
+
+    input {
+      padding: 0.55rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #111827;
+      background: #fff;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+      &:focus {
+        border-color: var(--rx-primary, #2563eb);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        outline: none;
       }
 
-      &.active {
-        background: $accent;
-        color: #fff;
-        border-color: $accent;
-        box-shadow: 0 2px 6px rgba($accent, .3);
+      &::placeholder {
+        color: #9ca3af;
       }
     }
   }
+}
 
-  // Buttons
+/* =============================
+   Signature Canvas
+   ============================= */
+.sig-wrap {
+  flex: 1;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+
+  canvas {
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    border-radius: 6px;
+  }
+}
+
+/* =============================
+   Action Buttons
+   ============================= */
+.signature-actions_ {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+
   .btn {
-    border: 1px solid $border-color;
-    border-radius: 8px;
-    font-size: .85rem;
-    padding: .55rem 1.1rem;
+    flex: 1 1 auto;
+    min-width: 100px;
+    max-width: 150px;
     display: flex;
     align-items: center;
-    gap: .5rem;
-    cursor: pointer;
-    transition: all .2s ease;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.95rem;
+    padding: 0.55rem 1rem;
+    border-radius: 6px;
     font-weight: 500;
-    box-shadow: 0 1px 3px $shadow;
+    transition: all 0.2s ease;
 
-    &.ghost {
-      background: $surface;
-      color: $text-dark;
-
-      &:hover:not(:disabled) {
-        background: $surface-alt;
-      }
+    .material-icons {
+      font-size: 1.1rem;
     }
 
     &.primary {
-      background: $accent;
-      color: white;
-      border-color: $accent;
+      background: var(--rx-primary, #2563eb);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
 
-      &:hover:not(:disabled) {
-        background: $accent-hover;
+      &:hover {
+        background: darken(#2563eb, 6%);
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+      }
+    }
+
+    &.ghost {
+      background: #f9fafb;
+      border: 1px solid #d1d5db;
+      color: #374151;
+
+      &:hover {
+        background: #f3f4f6;
+        border-color: #cbd5e1;
       }
     }
 
     &:disabled {
-      opacity: .55;
-      cursor: not-allowed;
-    }
-
-    .icon {
-      width: 1rem;
-      height: 1rem;
-      fill: currentColor;
+      opacity: 0.5;
+      pointer-events: none;
+      box-shadow: none;
     }
   }
 }
 
-// ===============================
-// Signature Canvas
-// ===============================
-.sig-wrap {
-  background: $surface-alt;
-  border: 2px dashed $border-color;
-  border-radius: 12px;
-  padding: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: border-color .3s ease, background .3s ease;
+/* =============================
+   Ink & Pen Settings (Choose Style)
+   ============================= */
+.signature-styles {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 
-  &:hover {
-    border-color: $accent;
-    background: lighten($surface-alt, 2%);
-  }
-
-  canvas {
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
-    height: 240px;
-    max-height: 360px;
-    background: $surface;
-    border: 1px solid $border-color;
-    border-radius: 8px;
-    cursor: crosshair;
-    box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+    padding: 0.9rem 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #111827;
+    list-style: none;
+    user-select: none;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #f3f4f6;
+    }
+
+    &::marker,
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::before {
+      content: "style";
+      font-family: "Material Icons";
+      font-size: 1rem;
+      margin-right: 0.5rem;
+      color: #6b7280;
+    }
+
+    &::after {
+      content: "expand_more";
+      font-family: "Material Icons";
+      font-size: 1.2rem;
+      color: #6b7280;
+      transition: transform 0.2s ease;
+    }
+  }
+
+  &[open] summary::after {
+    transform: rotate(180deg);
+  }
+
+  .signature-toolbar {
+    padding: 1rem;
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+
+    .ctrl {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      font-size: 0.85rem;
+      color: #374151;
+      font-weight: 500;
+    }
+
+    input[type="color"] {
+      width: 2.25rem;
+      height: 2.25rem;
+      border: none;
+      border-radius: 4px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+
+      &:hover {
+        transform: scale(1.05);
+      }
+    }
+
+    .thickness-group {
+      display: flex;
+      gap: 0.5rem;
+
+      .chip {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.35rem 0.7rem;
+        border: 1px solid #d1d5db;
+        border-radius: 20px;
+        background: #fff;
+        font-size: 0.8rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover {
+          border-color: #9ca3af;
+          background: #f9fafb;
+        }
+
+        &.active {
+          border-color: var(--rx-primary, #2563eb);
+          background: #eff6ff;
+          color: #1d4ed8;
+        }
+
+        .chip-dot {
+          display: inline-block;
+          border-radius: 50%;
+          background: currentColor;
+        }
+
+        &.thin .chip-dot {
+          width: 4px;
+          height: 4px;
+        }
+        &.med .chip-dot {
+          width: 6px;
+          height: 6px;
+        }
+        &.thick .chip-dot {
+          width: 8px;
+          height: 8px;
+        }
+      }
+    }
   }
 }
 
-// ===============================
-// Templates
-// ===============================
-.templates-list {
+/* =============================
+   Save Context Hint
+   ============================= */
+.save-context-hint {
   display: flex;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  margin-top: .75rem;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1fae5;
+  background: #ecfdf5;
+  color: #065f46;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  animation: fadeInSlide 0.3s ease;
+
+  .next-step {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #047857;
+  }
+}
+
+@keyframes fadeInSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =============================
+   Saved Signatures List
+   ============================= */
+.templates-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: auto;
 
   &.empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    text-align: center;
-    color: $text-muted;
-    padding: 2rem 1rem;
-
-    .title {
-      font-weight: 600;
-      margin-bottom: .35rem;
-      font-size: 1rem;
-    }
-
-    .hint {
-      font-size: .85rem;
-    }
+    color: #6b7280;
+    font-style: italic;
+    padding: 2rem;
+    border: 2px dashed #e5e7eb;
+    border-radius: 8px;
+    background: #fafafa;
   }
 
   .stamp-item {
     position: relative;
-    background: $surface;
-    border: 1px solid $border-color;
-    border-radius: 10px;
-    padding: .65rem;
-    transition: transform .15s ease, box-shadow .15s ease;
-    box-shadow: 0 1px 3px $shadow;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
 
     &:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
     }
 
     img {
-      display: block;
-      border-radius: 6px;
-      background: #fff;
-      padding: .35rem;
-      max-width: 140px;
+      max-width: 100%;
       max-height: 90px;
-      object-fit: contain;
+      cursor: grab;
+      transition: transform 0.15s ease;
+
+      &:active {
+        cursor: grabbing;
+        transform: scale(0.97);
+      }
     }
 
     .icon-btn {
       position: absolute;
-      top: .35rem;
-      right: .35rem;
-      background: $danger;
-      border: none;
-      border-radius: 50%;
-      width: 1.8rem;
-      height: 1.8rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      top: 6px;
+      right: 6px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid #e5e7eb;
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba($danger, 0.25);
-      opacity: 0;
-      transition: opacity .2s ease, background .2s ease;
-
-      svg {
-        width: 1rem;
-        height: 1rem;
-        fill: white;
-      }
+      padding: 0.25rem;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      transition: background 0.15s ease;
 
       &:hover {
-        background: darken($danger, 8%);
+        background: #f3f4f6;
+      }
+
+      .material-icons {
+        font-size: 1rem;
+        color: #374151;
       }
     }
+  }
 
-    &:hover .icon-btn {
-      opacity: 1;
+  .empty {
+    text-align: center;
+
+    .title {
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      color: #111827;
+    }
+    .hint {
+      font-size: 0.9rem;
+      color: #6b7280;
     }
   }
 }
 
-// ===============================
-// Accessibility
-// ===============================
-.btn:focus-visible,
-.chip:focus-visible,
-input[type="color"]:focus-visible {
-  outline: 2px solid $accent;
-  outline-offset: 3px;
-  border-radius: 6px;
+/* =============================
+   Responsive Adjustments
+   ============================= */
+@media (max-width: 768px) {
+  .signature-actions_ {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.5rem;
+
+    .btn {
+      flex: 1 1 0;
+      min-width: auto;
+      max-width: none;
+      font-size: 0.85rem;
+      padding: 0.45rem 0.75rem;
+      border-radius: 5px;
+    }
+  }
+
+  .signature-styles .signature-toolbar {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .templates-list {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .sig-wrap {
+    min-height: 160px;
+  }
+
+  .signature-actions_ {
+    gap: 0.4rem;
+
+    .btn {
+      font-size: 0.8rem;
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      min-width: unset;
+    }
+  }
+
+  .templates-list {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 0.75rem;
+  }
 }

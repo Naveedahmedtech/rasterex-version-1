@@ -1,19 +1,19 @@
-/* ===== Premium Light Theme for Properties Panel ===== */
+/* ===== Premium Light Theme (Compact Version) ===== */
 
 :host {
   /* Palette */
   --bg: #ffffff;
   --card: #ffffff;
-  --border: #e6e8ee;            /* soft border */
-  --muted: #6b7280;             /* slate-500 */
-  --text: #0f172a;              /* slate-900 */
-  --text-soft: #334155;         /* slate-700 */
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06);
-  --shadow-md: 0 6px 18px rgba(15, 23, 42, 0.08);
+  --border: #e6e8ee;
+  --muted: #6b7280;
+  --text: #0f172a;
+  --text-soft: #334155;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
 
   /* Brand */
-  --brand: #4f46e5;             /* indigo-600 */
-  --brand-hover: #4338ca;       /* indigo-700 */
+  --brand: #4f46e5;
+  --brand-hover: #4338ca;
   --brand-ring: rgba(79, 70, 229, 0.18);
 
   /* Status */
@@ -31,92 +31,89 @@
 
   display: block;
   color: var(--text);
-  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  font: 13px/1.4 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+    Helvetica, Arial;
   background: transparent;
 }
 
-.properties-panel-container {
-  padding: 16px 18px 20px;
-}
-
-/* Sections */
-.block-section + .block-section {
-  margin-top: 16px;
-}
-
-/* ===== Details card ===== */
-
-.details-card {
-  // border: 1px solid var(--border);
-  // border-radius: 12px;
-  padding: 16px;
-}
+/* Container */
 
 .section-title {
-  margin: 0 0 12px;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
   color: var(--text-soft);
 }
 
 .details-grid {
   display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 12px 18px;
+  grid-template-columns: 120px 1fr;
+  gap: 4px 8px;
 }
 
-.detail-row { display: contents; }
+.detail-row {
+  display: contents;
+}
 
 .label {
   font-weight: 600;
   color: var(--text-soft);
   align-self: start;
+  font-size: 12.5px;
 }
 
 .value {
   color: var(--text);
   word-break: break-word;
   align-self: start;
+  font-size: 13px;
 }
 
-.prewrap { white-space: pre-wrap; }
+.prewrap {
+  white-space: pre-wrap;
+}
 
 .preview-image {
   max-width: 100%;
-  max-height: 220px;
-  border-radius: 10px;
+  max-height: 180px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
   display: block;
 }
 
-.preview-image.small { max-height: 120px; }
+.preview-image.small {
+  max-height: 100px;
+}
 
 .file-link {
   color: var(--brand);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 1px;
+  font-size: 13px;
 }
 
 /* ===== Form card ===== */
-
 .form-section {
-  padding: 10px;
+  padding: 8px;
 }
 
 .field {
   display: grid;
-  gap: 6px;
-  margin-bottom: 12px;
+  gap: 4px;
+  margin-bottom: 10px;
 }
 
 label {
   font-weight: 600;
   color: var(--text-soft);
+  font-size: 12.5px;
 }
 
-.required { color: #dc2626; }
+.required {
+  color: #dc2626;
+}
 
 /* Inputs */
 input[type="text"],
@@ -124,15 +121,17 @@ textarea,
 select {
   border: 1px solid var(--border);
   background: #fff;
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
   font: inherit;
   color: var(--text);
-  transition: border-color .15s ease, box-shadow .15s ease, background .15s ease;
+  font-size: 13px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease,
+    background 0.15s ease;
 }
 
 textarea {
-  min-height: 96px;
+  min-height: 72px;
   resize: vertical;
 }
 
@@ -141,49 +140,40 @@ textarea:focus,
 select:focus {
   border-color: var(--brand);
   outline: none;
-  box-shadow: 0 0 0 3px var(--brand-ring);
+  box-shadow: 0 0 0 2px var(--brand-ring);
 }
 
 /* Char counter */
 .char-count {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--muted);
   text-align: right;
 }
-.char-count.limit-reached { color: #dc2626; }
+.char-count.limit-reached {
+  color: #dc2626;
+}
 
 /* ===== Actions (buttons) ===== */
-
 .actions-row {
-  margin-top: 14px;
+  margin-top: 10px;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start; /* change to flex-end if you prefer right aligned */
+  // flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
-/* Make buttons same height & tight side-by-side */
 .btn-group {
   display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: 8px;
+  // flex-wrap: wrap;
 }
-/* Danger: make sure there IS a border */
-.btn-danger {
-  background: #fff;
-  border: 1px solid #fca5a5;   /* red-300 */
-  color: var(--danger-fg);
-}
-.btn-danger:hover {
-  background: #feecec;
-  border-color: #f87171;       /* red-400 */
-}
+
 .btn {
-  flex: 0 0 auto; /* never full width */
-  min-width: 100px;
-  padding: 8px 18px;
-  border-radius: 8px;
+  flex: 0 0 auto;
+  min-width: 80px;
+  padding: 6px 14px;
+  border-radius: 6px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   transition: background-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -193,13 +183,13 @@ select:focus {
   background: linear-gradient(90deg, #7c3aed 0%, #6366f1 100%);
   color: #fff;
   border: none;
-  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.25);
+  box-shadow: 0 1px 2px rgba(124, 58, 237, 0.25);
 }
 .btn-primary:hover {
   background: linear-gradient(90deg, #6d28d9 0%, #4f46e5 100%);
 }
 
-/* Secondary / Ghost (Clear) */
+/* Ghost (Clear) */
 .btn-ghost {
   background: #fff;
   color: #374151;
@@ -209,30 +199,23 @@ select:focus {
   background: #f3f4f6;
 }
 
-
-.btn-ghost:hover {
-  background: #f8fafc;
-}
-
 /* Danger */
 .btn-danger {
   background: #fff;
-  border-color: #fca5a5;               /* red-300 */
+  border: 1px solid #fca5a5;
   color: var(--danger-fg);
 }
-
 .btn-danger:hover {
   background: #feecec;
-  border-color: #f87171;               /* red-400 */
+  border-color: #f87171;
 }
 
 /* ===== Alerts & Loading ===== */
-
 .alert {
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 8px 10px;
+  border-radius: 8px;
   border: 1px solid transparent;
-  font-size: 13px;
+  font-size: 12.5px;
 }
 
 .alert.success {
@@ -248,16 +231,107 @@ select:focus {
 }
 
 .loading-spinner {
-  font-size: 13px;
+  font-size: 12.5px;
   color: var(--muted);
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 768px) {
+/* ===== Responsive Enhancements ===== */
+
+/* Tablet (≤1024px) */
+@media (max-width: 1024px) {
   .details-grid {
-    grid-template-columns: 1fr;
-    gap: 6px 0;
+    grid-template-columns: 100px 1fr;
   }
-  .label { margin-top: 8px; }
-  .actions-row { justify-content: flex-start; }
+}
+
+/* Mobile (≤600px → iPhone bottom sheet style use case) */
+@media (max-width: 600px) {
+  .details-grid {
+    // grid-template-columns: 1fr;
+    gap: 0px 0;
+  }
+
+  .label {
+    font-size: 12px;
+    margin-top: 4px;
+  }
+  .value {
+    font-size: 12.5px;
+    padding-left: 6px; /* ✅ extra indentation for readability */
+  }
+
+  input[type="text"],
+  textarea,
+  select {
+    padding: 10px 12px; /* bigger tap targets */
+    font-size: 13px;
+  }
+
+  .btn {
+    min-width: 68px;
+    padding: 7px 12px;
+    font-size: 12.5px;
+  }
+}
+
+/* Extra small iPhone SE / Mini (≤390px) */
+@media (max-width: 390px) {
+  .details-grid {
+    gap: 0px 0px;
+  }
+  .section-title {
+    font-size: 12.5px;
+  }
+  .label {
+    font-size: 11.5px;
+  }
+  .value {
+    font-size: 12px;
+  }
+  .btn {
+    min-width: 64px;
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+}
+
+/* Desktop (≥1025px) improvements */
+@media (min-width: 1025px) {
+  .details-grid {
+    grid-template-columns: 140px 1fr; /* ✅ wider labels */
+    gap: 6px 12px;
+    margin-top: 6px;
+    margin-bottom: 10px;
+  }
+
+  .label {
+    font-size: 13px;
+    color: var(--text-soft);
+    padding-top: 2px;
+  }
+
+  .value {
+    font-size: 13.5px; /* ✅ values more prominent */
+    color: var(--text);
+  }
+
+  .section-title {
+    font-size: 14px;
+    margin-bottom: 6px;
+    color: var(--text-soft);
+    font-weight: 600;
+  }
+
+  .form-section {
+    padding: 12px 14px; /* ✅ more breathing room */
+  }
+}
+
+/* Safe area padding for iOS (if in iframe/bottom sheet) */
+@supports (padding: max(0px)) {
+  .properties-panel-container {
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }

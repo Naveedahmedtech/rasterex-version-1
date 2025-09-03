@@ -60,6 +60,51 @@ public isPlacing(): boolean {
 }
 
 
+
+/** ================= SIGNER INFO ================= */
+  private _signerName = new BehaviorSubject<string | null>(null);
+  public signerName$: Observable<string | null> = this._signerName.asObservable();
+
+  private _signerEmail = new BehaviorSubject<string | null>(null);
+  public signerEmail$: Observable<string | null> = this._signerEmail.asObservable();
+
+  public setSignerInfo(name: string, email: string): void {
+    this._signerName.next(name);
+    this._signerEmail.next(email);
+  }
+
+  public clearSignerInfo(): void {
+    this._signerName.next(null);
+    this._signerEmail.next(null);
+  }
+
+  public get signerName(): string | null {
+    return this._signerName.value;
+  }
+
+  public get signerEmail(): string | null {
+    return this._signerEmail.value;
+  }
+
+
+    /** ================= GENERIC TOGGLE FLAG ================= */
+  private _showSomething = new BehaviorSubject<boolean>(false);
+  public showSomething$: Observable<boolean> = this._showSomething.asObservable();
+
+  public setShowSomething(value: boolean): void {
+    this._showSomething.next(value);
+  }
+
+  public toggleShowSomething(): void {
+    this._showSomething.next(!this._showSomething.value);
+  }
+
+  public get showSomething(): boolean {
+    return this._showSomething.value;
+  }
+
+
+
   private _quickActionsMenuVisible: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public quickActionsMenuVisible$: Observable<boolean> = this._quickActionsMenuVisible.asObservable();
   public showQuickActionsMenu(): void {

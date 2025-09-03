@@ -1,40 +1,53 @@
 .panel-container {
-  position: fixed; // keeps it floating on the screen
+  position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); // centers it
-  // width: 400px;
-  max-width: 90%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 420px;
+  max-height: 70vh !important;   // ⬅️ constrain height so file is still visible
   background: #fff;
   border: 1px solid #ccc;
-  border-radius: 6px;
+  border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 999; // make sure it stays above normal content
-  color: #ffff !important;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;   // header fixed, body scrolls
 }
 
 .panel-header {
+  flex: 0 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1rem;
+  padding: 0.6rem 1rem;
   font-weight: 600;
   border-bottom: 1px solid #000;
   background-color: #052c65;
-  color: #ffff !important;
-}
-
-.panel-header .btn-close {
-  cursor: pointer;
-  font-size: 1.25rem;
-  line-height: 1;
-  color: #ffffff;
-
-  &:hover {
-    color: #fdfdfd;
-  }
+  color: #fff !important;
 }
 
 .panel-body {
-  padding: 1rem;
+  flex: 1 1 auto;
+  padding: 0.75rem;
+  overflow-y: auto;   // ⬅️ scrolls inside instead of growing
+}
+
+.btn-close {
+  cursor: pointer !important;
+}
+
+/* Mobile tweaks */
+@media (max-width: 600px) {
+  .panel-container {
+    width: 85%;
+    max-width: 360px;
+    border-radius: 6px;
+    max-height: 50vh !important;   // ⬅️ constrain height so file is still visible 
+  }
+
+  .panel-body {
+    padding: 0.5rem;
+  }
 }

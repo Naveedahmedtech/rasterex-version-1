@@ -1,4 +1,5 @@
 import {
+  ChangeDetectorRef,
   Component,
   EventEmitter,
   HostListener,
@@ -126,16 +127,18 @@ export class AnnotationToolsComponent implements OnInit {
   canDeleteAnnotation = this.userService.canDeleteAnnotation$;
 
   constructor(
-    public readonly service: AnnotationToolsService,
+    public service: AnnotationToolsService,
     private readonly rxCoreService: RxCoreService,
     private readonly userService: UserService,
     public sessionContext: SessionContextService,
     private readonly notificationService: NotificationService,
     private http: HttpClient,
-    public signatureModal: SignatureModalService
+    public signatureModal: SignatureModalService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    // RXCore.lockMarkup(true)
     console.log(
       'SELLL----kjdsf===ksdjf==++',
       this.rxCoreService.getSelectedMarkup()
@@ -186,8 +189,9 @@ export class AnnotationToolsComponent implements OnInit {
         markup !== -1 &&
         typeof (markup as any).getUniqueID === 'function'
       ) {
-        if (this.mode === 'signature') {
+        if (this.mode === 'signature' && this.isActionSelected['STAMP']) {
           this.signatureCreated = true;
+          this.isActionSelected['STAMP'] = false;
         }
         console.log('Operation created!', (markup as any).getUniqueID());
       } else {
@@ -198,7 +202,7 @@ export class AnnotationToolsComponent implements OnInit {
         if (markup.type == MARKUP_TYPES.COUNT.type) return;
         if (markup.type == MARKUP_TYPES.STAMP.type) {
           if (operation?.created) return;
-          this.isActionSelected['STAMP'] = false;
+          // this.isActionSelected['STAMP'] = false;
         }
       }
 
@@ -303,6 +307,68 @@ export class AnnotationToolsComponent implements OnInit {
   signaturePlaced = false;
   placingMode = false;
 
+  private savingGuard = false;
+
+  onSaveTap(ev?: Event) {
+    // prevent the viewer behind from eating the tap
+    ev?.preventDefault?.();
+    ev?.stopPropagation?.();
+
+    // de-dupe (click + pointerup + touchend can all fire on some devices)
+    if (this.savingGuard || this.savingSignature) return;
+    this.savingGuard = true;
+
+    // run your existing save flow
+    Promise.resolve(this.saveSignature())
+      .catch((err) => console.error('saveSignature failed:', err))
+      .finally(() => {
+        this.savingGuard = false;
+
+        // force Angular to paint the overlay updates
+        try {
+          this.cdr.detectChanges();
+        } catch {}
+
+        // nudge the viewer so the signature appears immediately
+        this.forceViewerRepaint();
+      });
+  }
+
+  /** Make the PDF/viewer layer repaint so the signature shows without scrolling */
+  private forceViewerRepaint() {
+    // 1) tiny scroll jiggle on the container, if it scrolls
+    const container = document.getElementById('pdf-container');
+    if (container) {
+      const y = container.scrollTop || 0;
+      container.scrollTo({ top: y + 1, behavior: 'auto' });
+      container.scrollTo({ top: y, behavior: 'auto' });
+    }
+
+    // 2) CSS composite nudge (works even if the viewer is inside)
+    requestAnimationFrame(() => {
+      const el = document.querySelector(
+        '#pdf-container, .pdf-viewer'
+      ) as HTMLElement;
+      if (!el) return;
+      const prev = el.style.transform;
+      el.style.willChange = 'transform';
+      el.style.transform = 'translateZ(0)'; // promote to its own layer
+      // revert on the next frame
+      requestAnimationFrame(() => {
+        el.style.transform = prev || '';
+        el.style.willChange = '';
+      });
+    });
+
+    // 3) As a fallback, broadcast a resize which many viewers listen to
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 0);
+
+    // 4) If RXCore exposes a light refresh, call it here
+    try {
+      (RXCore as any)?.refresh?.(); // if available
+      (RXCore as any)?.invalidate?.(); // if available
+    } catch {}
+  }
   startEllipseIssue(event?: MouseEvent) {
     if (event) {
       (event.target as HTMLElement)?.blur();
@@ -418,9 +484,9 @@ export class AnnotationToolsComponent implements OnInit {
 
     this.saveSignatureToServer()
       .then(() => {
-        RXCore.markUpFreePen(false);
-        RXCore.lockMarkup(true);
         RXCore.markUpSave();
+        RXCore.lockMarkup(true);
+        RXCore.markUpFreePen(false);
 
         this.signaturedSaved = true;
 
@@ -436,11 +502,11 @@ export class AnnotationToolsComponent implements OnInit {
             timestamp: new Date().toISOString(),
             signedBy: this.sessionContext.username,
             orderId: this.sessionContext.orderId,
-            fileId: this.sessionContext.projectId, // or actual file ID if you have it
+            fileId: this.sessionContext.projectId,
           },
         };
+        RXCore.exportPDF();
 
-        // debug—this should print inside the iframe’s console
         console.log(
           '[Angular ▶ parent] about to postMessage:',
           payload,
@@ -449,9 +515,22 @@ export class AnnotationToolsComponent implements OnInit {
         );
 
         window.parent.postMessage(payload, REACT_URL);
+
+        // 👇 Force Angular + viewer refresh (fix for mobile)
+        this.cdr.detectChanges();
+        setTimeout(() => {
+          const pdfContainer = document.getElementById('pdf-container');
+          if (pdfContainer) {
+            // this "nudges" the viewer so the signature overlay shows up immediately
+            pdfContainer.style.transform = 'translateY(1px)';
+            setTimeout(() => {
+              pdfContainer.style.transform = '';
+            }, 50);
+          }
+        }, 50);
       })
       .catch((error) => {
-        console.log(error);
+        console.error('Signature save failed:', error);
       })
       .finally(() => {
         this.savingSignature = false;
@@ -471,18 +550,30 @@ export class AnnotationToolsComponent implements OnInit {
   }
 
   saveSignatureToServer() {
-    // Return issueId
     return new Promise((resolve, reject) => {
-      const headers = new HttpHeaders();
+      const headers = new HttpHeaders({
+        'Content-Type': 'application/json',
+      });
+
+      const name = this.service.signerName; // { name, email }
+      const email = this.service.signerEmail; // { name, email }
+
+      const body = {
+        signerName: name,
+        signerEmail: email,
+        // add other fields (signature data, fileId, etc.)
+      };
+
       this.http
         .patch<any>(
           `${NEST_URL}/api/v1/universal/order/${this.sessionContext.orderId}/file`,
-          { headers }
+          body, // ✅ body goes here
+          { headers } // ✅ options go here
         )
         .subscribe({
           next: (response) => {
             console.log('Issue created successfully:', response?.data?.id);
-            resolve(response?.data); // âœ… Return the issueId
+            resolve(response?.data);
           },
           error: (error) => {
             console.error('Error creating issue:', error);
@@ -536,6 +627,12 @@ export class AnnotationToolsComponent implements OnInit {
     this.closeIssueModal();
   }
 
+  onExport() {
+    // RXCore.markUpSave();
+    // RXCore.lockMarkup(true);
+    RXCore.exportPDF();
+  }
+
   onActionSelect(actionName: string) {
     const selected = this.isActionSelected[actionName];
     this._deselectAllActions();
@@ -546,6 +643,10 @@ export class AnnotationToolsComponent implements OnInit {
 
     switch (actionName) {
       case 'TEXT':
+        RXCore.setGlobalStyle(true);
+        RXCore.changeStrokeColor('#000');
+        RXCore.changeTextColor('#000');
+        RXCore.setLineWidth(0.5);
         RXCore.markUpTextRect(this.isActionSelected[actionName]);
         break;
 
@@ -566,6 +667,11 @@ export class AnnotationToolsComponent implements OnInit {
       case 'SHAPE_ELLIPSE':
         console.log('I got selected!!');
         RXCore.setGlobalStyle(true);
+        RXCore.changeFillColor('#FF0000');
+        RXCore.changeStrokeColor('#FF0000');
+        RXCore.changeTransp(40);
+        RXCore.markUpFilled();
+        RXCore.setLineWidth(0);
         RXCore.markUpShape(this.isActionSelected[actionName], 1);
         break;
 
@@ -618,6 +724,9 @@ export class AnnotationToolsComponent implements OnInit {
         break;
 
       case 'PAINT_FREEHAND':
+        RXCore.setGlobalStyle(true);
+        RXCore.changeStrokeColor('#FF0000');
+        RXCore.setLineWidth(4);
         RXCore.markUpFreePen(this.isActionSelected[actionName]);
         if (!this.isActionSelected[actionName]) {
           RXCore.selectMarkUp(true);

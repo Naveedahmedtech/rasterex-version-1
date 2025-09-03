@@ -16,6 +16,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { StampStorageService } from './stamp-storage.service';
 import { UserService } from '../../user/user.service';
 import SignaturePad from 'signature_pad';
+import { AnnotationToolsService } from '../annotation-tools.service';
+
 
 @Component({
   selector: 'rx-stamp-panel',
@@ -26,7 +28,7 @@ export class StampPanelComponent implements OnInit {
   private templatesLoaded = false;
   @ViewChild('signatureCanvas', { static: false })
   signatureCanvas!: ElementRef<HTMLCanvasElement>;
-  private sigPad?: SignaturePad;
+  public sigPad?: SignaturePad;
   private sigPadMinWidth = 0.8;
   private sigPadMaxWidth = 2.5;
   // signature area inside Stamps modal
@@ -39,6 +41,9 @@ export class StampPanelComponent implements OnInit {
       this.resizeSignatureCanvas();
     }
   }
+
+
+   @ViewChild('savedList') savedList!: ElementRef;
 
   form: any = {};
   formConfig: any[];
@@ -87,6 +92,8 @@ export class StampPanelComponent implements OnInit {
   text: string = '';
   strokeThickness: number = 1;
   safeSvgContents: SafeHtml[] = [];
+  signerName: string = '';
+signerEmail: string = '';
 
   constructor(
     private readonly rxCoreService: RxCoreService,
@@ -94,7 +101,8 @@ export class StampPanelComponent implements OnInit {
     private readonly colorHelper: ColorHelper,
     private sanitizer: DomSanitizer,
     private readonly storageService: StampStorageService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+  public annotationToolService: AnnotationToolsService
   ) {}
   private _setDefaults(): void {
     this.isTextAreaVisible = false;
@@ -145,7 +153,9 @@ export class StampPanelComponent implements OnInit {
   }
 
   async saveSignatureAsStandardStamp(): Promise<void> {
+    console.log("Clicked saveSignatureAsStandardStamp");
     if (!this.sigPad || this.sigPad.isEmpty()) return;
+    console.log("Signature pad is not empty, proceeding to save.");
 
     const dataUrl = this.sigPad.toDataURL('image/png');
     const { imageData, width, height } = await this.convertUrlToBase64Data(
@@ -171,6 +181,16 @@ export class StampPanelComponent implements OnInit {
         });
         this.templates = [stampData]; // ⬅️ show only the one just saved
         this.sigPad?.clear();
+        this.annotationToolService.setShowSomething(true); 
+    // 2. After Angular has updated the DOM with the new template, scroll
+    setTimeout(() => {
+      if (this.savedList) {
+        this.savedList.nativeElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }, 300);
       })
       .catch((err) => console.error('Error saving signature stamp:', err));
   }
@@ -302,6 +322,17 @@ undoSignature() {
 
   ngOnInit(): void {
     queueMicrotask(() => this.initSignaturePad());
+
+      // Subscribe so the component always stays in sync
+  // this.annotationToolService.signerName$.subscribe(name => {
+  //   this.signerName = name;
+  //   this.cdr.markForCheck(); // if OnPush strategy
+  // });
+
+  // this.annotationToolService.signerEmail$.subscribe(email => {
+  //   this.signerEmail = email;
+  //   this.cdr.markForCheck();
+  // });
 
     this.getCustomStamps();
     this.getUploadImageStamps();

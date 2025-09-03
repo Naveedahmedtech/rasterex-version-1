@@ -46,6 +46,8 @@ export class AppMessageBrokerComponent implements OnInit {
             await firstValueFrom(this.rxCoreService.guiFileLoadComplete$);
             parent.postMessage({ type: "progressEnd" }, "*");
 
+
+
             break;
           }
 

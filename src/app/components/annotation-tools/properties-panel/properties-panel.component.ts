@@ -597,11 +597,15 @@ export class PropertiesPanelComponent implements OnInit {
         //       fileId: this.sessionContext.projectId, // or actual file ID if you have it
         //     }
         //   }, '*');
+    RXCore.exportPDF();
+
         this.notificationService.notification({
           message: 'Issue Created Successfully!',
           type: 'success',
         });
       })
+
+
       .catch((error) => {
         RXCore.markUpSave(); // still save even if issue fails
         this.errorMessage = 'Issue creation failed. Please try again.';
@@ -609,6 +613,10 @@ export class PropertiesPanelComponent implements OnInit {
       })
       .finally(() => {
         this.isLoading = false;
+        this.formTitle = '';
+this.formDescription = '';
+this.base64Image = null;
+this.imagePreview = null;
       });
   }
 
@@ -840,7 +848,11 @@ export class PropertiesPanelComponent implements OnInit {
       return;
     }
 
-    this.imagePreview = null;
+this.formTitle = '';
+this.formDescription = '';
+this.base64Image = null;
+this.imagePreview = null;
+
 
     this.markup = markup;
     const markupObj = (RXCore as any).getmarkupobjByGUID(markup.uniqueID);
@@ -868,16 +880,16 @@ export class PropertiesPanelComponent implements OnInit {
     this.showForm = false;
   }
 
-  onDelete() {
-    this.rxCoreService.guiMarkup$.subscribe(({ markup, operation }) => {
-      if (operation?.created) {
-        RXCore.selectMarkUp(true);
-      }
-    });
-    this.deleteIssue().then((response) => {
+onDelete() {
+  this.rxCoreService.guiMarkup$.subscribe(({ markup, operation }) => {
+    if (operation?.created) {
+      RXCore.selectMarkUp(true);
+    }
+  });
+
+  this.deleteIssue()
+    .then((response) => {
       if (response) {
-
-
         const payload = {
           type: 'ISSUE_SAVE',
           payload: {
@@ -885,11 +897,10 @@ export class PropertiesPanelComponent implements OnInit {
             timestamp: new Date().toISOString(),
             signedBy: this.sessionContext.username,
             orderId: this.sessionContext.orderId,
-            fileId: this.sessionContext.projectId, // or actual file ID if you have it
+            fileId: this.sessionContext.projectId,
           },
         };
 
-        // debug—this should print inside the iframe’s console
         console.log(
           '[Angular ▶ parent] about to postMessage:',
           payload,
@@ -898,14 +909,29 @@ export class PropertiesPanelComponent implements OnInit {
         );
 
         window.parent.postMessage(payload, REACT_URL);
+
+        this.notificationService.notification({
+          message: 'Issue Deleted Successfully!',
+          type: 'success',
+        });
+      }
+    })
+    .catch((error) => {
+      if (error?.status === 401) {
+        this.notificationService.notification({
+          message: 'You cannot delete this issue because it was created by another user.',
+          type: 'error',
+        });
+      } else {
+        this.notificationService.notification({
+          message: 'Failed to delete issue. Please try again later.',
+          type: 'error',
+        });
       }
     });
-    this.visible = false;
-    this.notificationService.notification({
-      message: 'Issue Deleted Successfully!',
-      type: 'success',
-    });
-  }
+
+  this.visible = false;
+}
 
 deleteIssue() {
   return new Promise((resolve, reject) => {
@@ -914,7 +940,7 @@ deleteIssue() {
     this.http
       .request('delete', `${NEST_URL}/api/v1/issue/${this.issueId}`, {
         headers,
-        body: { userId: this.sessionContext.userId },   
+        body: { userId: this.sessionContext.userId },
       })
       .subscribe({
         next: (response) => {
@@ -925,7 +951,7 @@ deleteIssue() {
         },
         error: (error) => {
           console.error('Error deleting issue:', error);
-          reject(error);
+          reject(error); // will be caught in onDelete
         },
       });
   });

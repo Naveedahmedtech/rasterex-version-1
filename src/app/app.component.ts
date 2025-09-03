@@ -343,10 +343,10 @@ private offset = { x: 0, y: 0 };
         this.sessionContext.mode === 'signature' &&
         !this.sessionContext.isSigned
       ) {
-        this.notificationService.notification({
-          message: 'zoom into the area of signing',
-          type: 'info',
-        });
+        // this.notificationService.notification({
+        //   message: 'zoom into the area of signing',
+        //   type: 'info',
+        // });
       }
       this.sessionContext.setFileReady(true);
       console.log('RxCore onGuiFileLoadComplete:');

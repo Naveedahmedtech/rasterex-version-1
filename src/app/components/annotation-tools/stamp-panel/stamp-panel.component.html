@@ -5,16 +5,12 @@
 >
   <div class="stamp-panel-container">
     <section *ngIf="activeIndexStamp === 1">
-      <!-- Toolbar -->
-      <div
-        class="signature-toolbar"
-        role="toolbar"
-        aria-label="Signature tools"
-        [ngStyle]="{ '--ink': textColor }"
-      >
-        <div class="toolbar-left">
+      <!-- Toggleable styles -->
+      <details class="signature-styles">
+        <summary>Click to choose Styles</summary>
+        <div class="signature-toolbar" [ngStyle]="{ '--ink': textColor }">
           <label class="ctrl">
-            <span>Color</span>
+            <span> <span class="material-icons">palette</span> Color </span>
             <input
               type="color"
               [value]="textColor"
@@ -22,10 +18,13 @@
               aria-label="Ink color"
             />
           </label>
-
           <div class="ctrl">
-            <span>Thickness</span>
-            <div class="thickness-group" role="group" aria-label="Pen thickness">
+            <span> <span class="material-icons">edit</span> Thickness </span>
+            <div
+              class="thickness-group"
+              role="group"
+              aria-label="Pen thickness"
+            >
               <button
                 type="button"
                 class="chip thin"
@@ -33,8 +32,7 @@
                 [attr.aria-pressed]="selectedThickness === 1"
                 (click)="setPenWidth(1)"
               >
-                <span class="chip-dot" aria-hidden="true"></span>
-                Thin
+                <span class="chip-dot"></span> Thin
               </button>
               <button
                 type="button"
@@ -43,8 +41,7 @@
                 [attr.aria-pressed]="selectedThickness === 2"
                 (click)="setPenWidth(2)"
               >
-                <span class="chip-dot" aria-hidden="true"></span>
-                Med
+                <span class="chip-dot"></span> Med
               </button>
               <button
                 type="button"
@@ -53,48 +50,59 @@
                 [attr.aria-pressed]="selectedThickness === 3"
                 (click)="setPenWidth(3)"
               >
-                <span class="chip-dot" aria-hidden="true"></span>
-                Thick
+                <span class="chip-dot"></span> Thick
               </button>
             </div>
           </div>
         </div>
+      </details>
 
-        <div class="toolbar-right">
-          <button
-            class="btn ghost"
-            type="button"
-            (click)="undoSignature()"
-            [disabled]="!sigPad || sigPad.isEmpty()"
-          >
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M7 7v4h4M7 11a7 7 0 1 0 2.05-4.95L7 7" />
-            </svg>
-            Undo
-          </button>
-          <button
-            class="btn ghost"
-            type="button"
-            (click)="clearSignature()"
-            [disabled]="!sigPad || sigPad.isEmpty()"
-          >
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M3 6h18M8 6l1 12h6l1-12M10 6V4h4v2" />
-            </svg>
-            Clear
-          </button>
-          <button
-            class="btn primary"
-            type="button"
-            (click)="saveSignatureAsStandardStamp()"
-            [disabled]="!sigPad || sigPad.isEmpty()"
-          >
-            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M5 20h14V7l-3-3H5zM9 20v-6h6v6" />
-            </svg>
-            Save
-          </button>
-        </div>
+      <!-- Signer Info -->
+      <!-- Signer Info -->
+      <div class="signer-info">
+        <!-- Name -->
+        <label class="ctrl">
+          <span> <span class="material-icons">person</span> Name </span>
+          <input
+            type="text"
+            name="signerName"
+            [(ngModel)]="signerName"
+            #nameCtrl="ngModel"
+            required
+            (ngModelChange)="
+              annotationToolService.setSignerInfo(signerName, signerEmail)
+            "
+            placeholder="Enter your full name"
+          />
+          <div class="error" *ngIf="nameCtrl.invalid && nameCtrl.touched">
+            Name is required.
+          </div>
+        </label>
+
+        <!-- Email -->
+        <label class="ctrl">
+          <span> <span class="material-icons">email</span> Email </span>
+          <input
+            type="email"
+            name="signerEmail"
+            [(ngModel)]="signerEmail"
+            #emailCtrl="ngModel"
+            required
+            email
+            (ngModelChange)="
+              annotationToolService.setSignerInfo(signerName, signerEmail)
+            "
+            placeholder="Enter your email"
+          />
+          <div class="error" *ngIf="emailCtrl.invalid && emailCtrl.touched">
+            <span class="error" *ngIf="emailCtrl.errors?.['required']"
+              >Email is required.</span
+            >
+            <span class="error" *ngIf="emailCtrl.errors?.['email']"
+              >Enter a valid email address.</span
+            >
+          </div>
+        </label>
       </div>
 
       <!-- Signature canvas -->
@@ -102,10 +110,58 @@
         <canvas #signatureCanvas></canvas>
       </div>
 
-      <!-- Latest signature list -->
-      <div class="templates-list" [class.empty]="!templates?.length" aria-label="Saved signatures">
+      <!-- Actions: Undo, Clear, Save -->
+      <div
+        class="signature-actions_"
+        role="group"
+        aria-label="Signature actions"
+      >
+        <button
+          class="btn ghost"
+          type="button"
+          (click)="undoSignature()"
+          [disabled]="!sigPad || sigPad.isEmpty()"
+        >
+          <span class="material-icons">undo</span> Undo
+        </button>
+        <button
+          class="btn ghost"
+          type="button"
+          (click)="clearSignature()"
+          [disabled]="!sigPad || sigPad.isEmpty()"
+        >
+          <span class="material-icons">clear</span> Clear
+        </button>
+        <button
+          class="btn primary"
+          type="button"
+          (click)="saveSignatureAsStandardStamp()"
+          [disabled]="
+            !signerName || !signerEmail || !sigPad || sigPad.isEmpty()
+          "
+        >
+          <span class="material-icons">save</span> Save
+        </button>
+      </div>
+
+      <div *ngIf="templates?.length" class="save-context-hint">
+        <span class="next-step"
+          >Just drag it from the list below into your document.</span
+        >
+      </div>
+
+      <!-- Saved signature list -->
+      <div
+        #savedList
+        class="templates-list"
+        [class.empty]="!templates?.length"
+        aria-label="Saved signatures"
+      >
         <ng-container *ngIf="templates?.length; else emptyState">
-          <div class="stamp-item" *ngFor="let template of templates; index as i">
+          <div
+            class="stamp-item"
+            *ngFor="let template of templates; index as i"
+          >
             <img
               [stampTemplate]="template"
               [src]="template.src"
@@ -114,6 +170,7 @@
                 'height.px': template.height
               }"
               alt="Saved signature"
+              draggable="true"
             />
             <button
               title="Delete"
@@ -123,9 +180,7 @@
               aria-label="Delete signature"
               type="button"
             >
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M3 6h18M8 6l1 12h6l1-12M10 6V4h4v2" />
-              </svg>
+              <span class="material-icons">delete</span>
             </button>
           </div>
         </ng-container>
@@ -133,7 +188,10 @@
         <ng-template #emptyState>
           <div class="empty">
             <div class="title">No signatures yet</div>
-            <div class="hint">Draw above and press <b>Save</b>.</div>
+            <div class="hint">
+              Draw above and press <b>Save</b>. Then drag your saved signature
+              into the document.
+            </div>
           </div>
         </ng-template>
       </div>

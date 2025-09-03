@@ -1,76 +1,196 @@
 <!-- Annotation Tools Container -->
-<div class="annotation-tools-container" *ngIf="(opened$ | async) && sessionContext.isFileReady">
+<div
+  class="annotation-tools-container"
+  *ngIf="(opened$ | async) && sessionContext.isFileReady"
+>
 
-  <!-- âœ… Create Issue Button -->
-  <button
-    *ngIf="(canAddAnnotation | async) && !(guiConfig$ | async)?.disableMarkupShapeButton && !annotationCreated && !(service.openIssueForm$ | async) && mode === 'annotation'"
-    class="create-issue-btn-floating button-fixed-bottom"
-    (click)="startEllipseIssue($event)"
-  >
-    Create Issue
-  </button>
 
-  <!-- âœ… Signature Buttons (Create, Save, Delete) -->
-  <div *ngIf="!sessionContext.isSigned && mode === 'signature' && !signaturedSaved">
 
+  <!-- Floating Toolbar -->
+  <div class="floating-toolbar">
+    <!-- TEXT -->
     <button
-      *ngIf="(canAddAnnotation | async) && !(guiConfig$ | async)?.disableMarkupShapeButton && !annotationCreated && !(service.openIssueForm$ | async) && !signatureCreated"
-      class="create-issue-btn-floating button-fixed-bottom"
-      (click)="onActionSelect('STAMP')"
+      *ngIf="
+        (canAddAnnotation | async) &&
+        !(guiConfig$ | async)?.disableMarkupShapeButton &&
+        !(service.openIssueForm$ | async) &&
+        !sessionContext.isSigned &&
+        mode === 'signature' &&
+        !(service.showSomething$ | async)
+      "
+      class="tool-btn"
+      [class.active]="isActionSelected['TEXT']"
+      (click)="onActionSelect('TEXT')"
     >
-      Create Signature
+      <span class="material-icons">title</span>
+      <span class="tooltip">Text</span>
     </button>
 
-    <div class="signature-button-group" *ngIf="signatureCreated">
-      <button
-        class="create-issue-btn-floating"
-        [disabled]="savingSignature"
-        (click)="saveSignature()">
-        <ng-container *ngIf="!savingSignature">Save</ng-container>
-        <ng-container *ngIf="savingSignature">
-          <span class="spinner"></span> Saving...
-        </ng-container>
-      </button>
+    <!-- FREEHAND -->
+    <button
+      *ngIf="
+        (canAddAnnotation | async) &&
+        !(guiConfig$ | async)?.disableMarkupShapeButton &&
+        !(service.openIssueForm$ | async) &&
+        !sessionContext.isSigned &&
+        mode === 'signature' &&
+        !(service.showSomething$ | async)
+      "
+      class="tool-btn"
+      [class.active]="isActionSelected['PAINT_FREEHAND']"
+      (click)="onActionSelect('PAINT_FREEHAND')"
+    >
+      <span class="material-icons">brush</span>
+      <span class="tooltip">Freehand</span>
+    </button>
+
+    <!-- FREEHAND -->
+    <button
+      *ngIf="
+        (canAddAnnotation | async) &&
+        !(guiConfig$ | async)?.disableMarkupShapeButton &&
+        !(service.openIssueForm$ | async) &&
+        !sessionContext.isSigned &&
+        mode === 'signature' &&
+        !(service.showSomething$ | async)
+      "
+      class="tool-btn"
+      (click)="onAction(true)"
+    >
+      <span class="material-icons">undo</span>
+      <span class="tooltip">Undo</span>
+    </button>
+
+    <!-- FREEHAND -->
+    <button
+      *ngIf="
+        (canAddAnnotation | async) &&
+        !(guiConfig$ | async)?.disableMarkupShapeButton &&
+        !(service.openIssueForm$ | async) &&
+        !sessionContext.isSigned &&
+        mode === 'signature' &&
+        !(service.showSomething$ | async)
+      "
+      class="tool-btn"
+      (click)="onAction(false)"
+    >
+      <span class="material-icons">redo</span>
+      <span class="tooltip">Redo</span>
+    </button>
 
 
-      <!-- <button class="create-issue-btn-floating delete" (click)="onActionSelect('STAMP')">Reset</button> -->
-    </div>
+    
+    <button
+      *ngIf="
+        (canAddAnnotation | async) &&
+        !(guiConfig$ | async)?.disableMarkupShapeButton &&
+        !annotationCreated &&
+        !(service.openIssueForm$ | async) &&
+        mode === 'annotation'
+      "
+    class="create-issue-btn-floating button-fixed-bottom"
+      (click)="startEllipseIssue($event)"
+    >
+      Create Issue
+    </button>
 
+    <!-- SIGNATURE -->
+    <button
+      *ngIf="
+        (canAddAnnotation | async) &&
+        !(guiConfig$ | async)?.disableMarkupShapeButton &&
+        !(service.openIssueForm$ | async) &&
+        !sessionContext.isSigned &&
+        mode === 'signature' &&
+        !signaturedSaved &&
+        !(service.showSomething$ | async)
+      "
+      class="tool-btn"
+      [class.active]="isActionSelected['STAMP']"
+      (click)="onActionSelect('STAMP')"
+    >
+      <span class="material-icons">border_color</span>
+      <span class="tooltip">Sign</span>
+    </button>
   </div>
 
-  <!-- âœ… Confirm Annotation Button -->
-  <button *ngIf="annotationCreated && mode === 'annotation'"
-          class="create-issue-btn-floating button-fixed-bottom"
-          (click)="confirmAnnotation()"
+
+
+  <!-- SIGNATURE SAVE / RESET -->
+  <div
+    class="signature-actions"
+    *ngIf="
+      (service.showSomething$ | async) && !signaturedSaved && signatureCreated
+    "
+  >
+    <button
+      class="action-btn save"
+      [disabled]="savingSignature"
+      (click)="saveSignature()"
+    >
+      <span class="material-icons">save</span>
+      <ng-container *ngIf="!savingSignature">Save</ng-container>
+      <ng-container *ngIf="savingSignature">
+        <span class="spinner"></span> Saving...
+      </ng-container>
+    </button>
+
+    <!-- <button class="action-btn reset" (click)="onActionSelect('STAMP')">
+      <span class="material-icons">restart_alt</span>
+      Reset
+    </button> -->
+  </div>
+
+  <!-- Confirm Annotation -->
+  <button
+    *ngIf="annotationCreated && mode === 'annotation'"
+    class="fab confirm-btn"
+    (click)="confirmAnnotation()"
   >
     Next
   </button>
 
-  <!-- ðŸ§© Annotation Panels -->
+  <!-- Annotation Panels -->
   <div class="annotation-panels-container">
     <rx-erase-panel></rx-erase-panel>
     <rx-count-panel *ngIf="isActionSelected['COUNT']"></rx-count-panel>
-    <rx-stamp-panel *ngIf="isActionSelected['STAMP']" (onClose)="onActionSelect('STAMP')"></rx-stamp-panel>
-    <rx-image-library *ngIf="isActionSelected['IMAGES_LIBRARY']" (onClose)="onActionSelect('IMAGES_LIBRARY')"></rx-image-library>
-    <rx-symbols-library *ngIf="isActionSelected['SYMBOLS_LIBRARY']" (onClose)="onActionSelect('SYMBOLS_LIBRARY')"></rx-symbols-library>
-    <rx-links-library *ngIf="isActionSelected['LINKS_LIBRARY']" (onClose)="onActionSelect('LINKS_LIBRARY')"></rx-links-library>
+    <rx-stamp-panel
+      *ngIf="isActionSelected['STAMP']"
+      (onClose)="onActionSelect('STAMP')"
+    ></rx-stamp-panel>
+    <rx-image-library
+      *ngIf="isActionSelected['IMAGES_LIBRARY']"
+      (onClose)="onActionSelect('IMAGES_LIBRARY')"
+    ></rx-image-library>
+    <rx-symbols-library
+      *ngIf="isActionSelected['SYMBOLS_LIBRARY']"
+      (onClose)="onActionSelect('SYMBOLS_LIBRARY')"
+    ></rx-symbols-library>
+    <rx-links-library
+      *ngIf="isActionSelected['LINKS_LIBRARY']"
+      (onClose)="onActionSelect('LINKS_LIBRARY')"
+    ></rx-links-library>
     <rx-measure-panel></rx-measure-panel>
   </div>
-
 </div>
 
-<!-- ðŸ› ï¸ Global Tools -->
+<!-- Global Tools -->
 <rx-context-editor></rx-context-editor>
 <rx-quick-actions-menu></rx-quick-actions-menu>
 <rx-note-popover></rx-note-popover>
 <rx-note-popover [mode]="'tooltip'"></rx-note-popover>
-<rx-measure-detail-panel *ngIf="!(guiConfig$ | async).disableMarkupMeasureButton"></rx-measure-detail-panel>
+<rx-measure-detail-panel
+  *ngIf="!(guiConfig$ | async).disableMarkupMeasureButton"
+></rx-measure-detail-panel>
 
-<rx-signature-modal *ngIf="(signatureModal.state$ | async)?.isOpen" (signatureSaved)="onSignatureSaved($event)"></rx-signature-modal>
-<!-- signature overlay area -->
+<rx-signature-modal
+  *ngIf="(signatureModal.state$ | async)?.isOpen"
+  (signatureSaved)="onSignatureSaved($event)"
+></rx-signature-modal>
+
+<!-- Signature Overlay Area -->
 <div id="pdf-container" class="pdf-viewer" (click)="placeSignature($event)">
-  <!-- Signature overlay -->
-  <div 
+  <div
     *ngIf="signatureImage && signaturePlaced"
     class="signature-overlay"
     [style.top.px]="signaturePosition.y"
