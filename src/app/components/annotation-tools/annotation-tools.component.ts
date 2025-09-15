@@ -632,7 +632,19 @@ export class AnnotationToolsComponent implements OnInit {
     // RXCore.lockMarkup(true);
     RXCore.exportPDF();
   }
-
+  saveFreehandText() {
+    if (this.isActionSelected['PAINT_FREEHAND']) {
+      this.onActionSelect('PAINT_FREEHAND');
+    }
+    if (this.isActionSelected['TEXT']) {
+      this.onActionSelect('TEXT');
+    }
+    RXCore.markUpSave();
+    this.notificationService.notification({
+      message: 'Successfully saved!',
+      type: 'success',
+    });
+  }
   onActionSelect(actionName: string) {
     const selected = this.isActionSelected[actionName];
     this._deselectAllActions();
