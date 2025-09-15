@@ -221,6 +221,10 @@ export class AnnotationToolsComponent implements OnInit {
             // RXCore.markUpSave();
             this.confirmAnnotation();
           }
+
+          if (this.mode === 'signature' && this.isActionSelected['TEXT']) {
+            console.log('HELLO WORLD!');
+          }
         }
         //this._deselectAllActions();
 
@@ -308,6 +312,20 @@ export class AnnotationToolsComponent implements OnInit {
   placingMode = false;
 
   private savingGuard = false;
+
+  saveFreehandText() {
+    if (this.isActionSelected['PAINT_FREEHAND']) {
+      this.onActionSelect('PAINT_FREEHAND');
+    }
+    if (this.isActionSelected['TEXT']) {
+      this.onActionSelect('TEXT');
+    }
+    RXCore.markUpSave();
+    this.notificationService.notification({
+      message: 'Successfully saved!',
+      type: 'success',
+    });
+  }
 
   onSaveTap(ev?: Event) {
     // prevent the viewer behind from eating the tap

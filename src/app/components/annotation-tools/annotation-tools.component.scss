@@ -175,3 +175,40 @@
   max-height: 80px;
   opacity: 0.95;
 }
+/* === Freehand/Text Save Button (Bottom Center) === */
+.save-actions {
+  position: fixed;
+  bottom: 20px;
+  right: -24px;
+  transform: translateX(-50%);
+  z-index: 2100;
+
+  .action-btn.save {
+    background: #0d2938;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+
+    &:hover {
+      background: #194157;
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .material-icons {
+      font-size: 20px;
+    }
+  }
+}

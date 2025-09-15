@@ -3,9 +3,6 @@
   class="annotation-tools-container"
   *ngIf="(opened$ | async) && sessionContext.isFileReady"
 >
-
-
-
   <!-- Floating Toolbar -->
   <div class="floating-toolbar">
     <!-- TEXT -->
@@ -44,7 +41,7 @@
       <span class="tooltip">Freehand</span>
     </button>
 
-    <!-- FREEHAND -->
+    <!-- UNDO -->
     <button
       *ngIf="
         (canAddAnnotation | async) &&
@@ -61,7 +58,7 @@
       <span class="tooltip">Undo</span>
     </button>
 
-    <!-- FREEHAND -->
+    <!-- REDO -->
     <button
       *ngIf="
         (canAddAnnotation | async) &&
@@ -78,8 +75,7 @@
       <span class="tooltip">Redo</span>
     </button>
 
-
-    
+    <!-- ISSUE -->
     <button
       *ngIf="
         (canAddAnnotation | async) &&
@@ -88,7 +84,7 @@
         !(service.openIssueForm$ | async) &&
         mode === 'annotation'
       "
-    class="create-issue-btn-floating button-fixed-bottom"
+      class="create-issue-btn-floating button-fixed-bottom"
       (click)="startEllipseIssue($event)"
     >
       Create Issue
@@ -114,9 +110,26 @@
     </button>
   </div>
 
+  <!-- Save button for Freehand + Text -->
+  <div
+    class="save-actions"
+    *ngIf="
+      mode === 'signature' &&
+      !(service.showSomething$ | async) &&
+      !sessionContext.isSigned &&
+      !signaturedSaved
+    "
+  >
+    <button
+      class="action-btn save"
+      (click)="saveFreehandText()"
+    >
+      <span class="material-icons">save</span>
+      <ng-container>Save</ng-container>
+    </button>
+  </div>
 
-
-  <!-- SIGNATURE SAVE / RESET -->
+  <!-- SIGNATURE SAVE / RESET (modal) -->
   <div
     class="signature-actions"
     *ngIf="
@@ -134,11 +147,6 @@
         <span class="spinner"></span> Saving...
       </ng-container>
     </button>
-
-    <!-- <button class="action-btn reset" (click)="onActionSelect('STAMP')">
-      <span class="material-icons">restart_alt</span>
-      Reset
-    </button> -->
   </div>
 
   <!-- Confirm Annotation -->
